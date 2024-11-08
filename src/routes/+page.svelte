@@ -1,47 +1,53 @@
-<script>
-// @ts-nocheck
+<script lang="ts">
+	import { Paginator } from '@skeletonlabs/skeleton';
+	import { fetchMovies } from './homepage';
+	import type { PaginationSettings } from '@skeletonlabs/skeleton';
+	import { onMount } from 'svelte';
 
-    import { onMount } from 'svelte';
-    import { fetchMovies } from '../lib/api.js';
+    interface Movies {
+        items: any[],
+        pagination: any,
+        status: boolean
+    }
+	let movies: Movies = { items: [], pagination: [], status: false };
 
-	export let paginationSettings;
+	onMount(async () => {
+		await loadMovies(paginationSettings.page);
+	});
 
-    // @ts-ignore
-    let movies = [];
+	let paginationSettings = {
+		page: 0,
+		limit: 10,
+		size: 0,
+		amounts: [10]
+	} satisfies PaginationSettings;
 
-    // Hàm lấy dữ liệu từ API khi component được mount
-    onMount(async () => {
-        await loadMovies(paginationSettings.page);
-    });
+	$: if (movies && movies.items) {
+        paginationSettings.limit = movies.items.length;
+        paginationSettings.size = movies.pagination.totalItems;
+    }
 
-	// Gọi lại `loadMovies` khi `paginationSettings.page` thay đổi
-    $: {
-    if (paginationSettings.page) {
+	function pageChanges(e: CustomEvent) {
         loadMovies(paginationSettings.page);
-    	}
 	}
 
-    // @ts-ignore
-    async function loadMovies(page) {
-        const data = await fetchMovies(page);
-		console.log("Data from API:", data);
-        if (data) {
-            movies = data.movies; // Cập nhật dựa vào cấu trúc JSON của API
-        } else {
-			movies = [];
-		}
+    async function loadMovies(page: number) {
+        const data: any = await fetchMovies(page);
+        if (data.status == true) {
+            movies = data;
+            console.log(movies)
+        }
     }
 </script>
 
 <h1>Danh Sách Phim Mới Cập Nhật</h1>
 
 <div>
-    {#if movies.length > 0}
+    {#if movies.items.length > 0}
         <ul>
-            {#each movies as movie}
+            {#each movies.items as movie}
                 <li>
-                    <h2>{movie.title}</h2>
-                    <p>{movie.description}</p>
+                    <h2>{movie.name}</h2>
                 </li>
             {/each}
         </ul>
@@ -49,3 +55,5 @@
         <p>Không có dữ liệu</p>
     {/if}
 </div>
+
+<Paginator bind:settings={paginationSettings} showNumerals on:page={pageChanges} />

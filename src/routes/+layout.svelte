@@ -1,35 +1,17 @@
 <script lang="ts">
 	import '../app.postcss';
 	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
-
-	// Floating UI for Popups
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
 	import { Search, History, List, UserRound } from 'lucide-svelte';
 	import { TabGroup, TabAnchor, Paginator } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
-	import type { PaginationSettings } from '$lib';
+
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
-
-	const source = [];
-
-	let paginationSettings = {
-		page: 1,
-		limit: 5,
-		size: source.length,
-		amounts: [1,2,5,10],
-	} satisfies PaginationSettings;
-
-	function onPageChange(newPage: number) {
-        paginationSettings.page = newPage;
-    }
-					
 </script>
 
-<!-- App Shell -->
-<AppShell>			
+<AppShell>
 	<svelte:fragment slot="header">
-		<!-- App Bar -->
 		<AppBar>
 			<svelte:fragment slot="lead">
 				<strong class="text-xl uppercase">CINESTREAM</strong>
@@ -59,14 +41,4 @@
 	</svelte:fragment>
 
 	<slot />
-	
-	<svelte:fragment slot="footer">
-		<Paginator
-			bind:settings={paginationSettings}
-			showFirstLastButtons="{false}"
-			showPreviousNextButtons="{true}"
-			on:change={(event) => onPageChange(event.detail.page)}
-		/>
-	</svelte:fragment>
 </AppShell>
-
