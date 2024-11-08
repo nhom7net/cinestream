@@ -17,13 +17,13 @@
 
 	let paginationSettings = {
 		page: 0,
-		limit: 10,
+		limit: 0,
 		size: 0,
-		amounts: [10]
+		amounts: [1]
 	} satisfies PaginationSettings;
 
 	$: if (movies && movies.items) {
-        paginationSettings.limit = movies.items.length;
+        paginationSettings.limit = movies.pagination.totalItemsPerPage;
         paginationSettings.size = movies.pagination.totalItems;
     }
 
@@ -35,7 +35,6 @@
         const data: any = await fetchMovies(page);
         if (data.status == true) {
             movies = data;
-            console.log(movies)
         }
     }
 </script>
