@@ -3,8 +3,8 @@
 	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
-	import { Search, History, List, UserRound } from 'lucide-svelte';
-	import { TabGroup, TabAnchor, Paginator } from '@skeletonlabs/skeleton';
+	import { Search, History, List, UserRound, Bookmark } from 'lucide-svelte';
+	import { TabGroup, TabAnchor } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
@@ -14,14 +14,14 @@
 	<svelte:fragment slot="header">
 		<AppBar>
 			<svelte:fragment slot="lead">
-				<strong class="text-xl uppercase">CINESTREAM</strong>
+				<strong class="text-xl uppercase text-yellow-500">CINESTREAM</strong>
 			</svelte:fragment>
 			<TabGroup>
-				<TabAnchor href="/Home" selected={$page.url.pathname === '/Home'}>Home</TabAnchor>
-				<TabAnchor href="/TVShows" selected={$page.url.pathname === '/TVShows'}>TV Shows</TabAnchor>
-				<TabAnchor href="/Movies" selected={$page.url.pathname === '/Movies'}>Movies</TabAnchor>
-				<TabAnchor href="/New" selected={$page.url.pathname === '/New'}>New & Popular</TabAnchor>
-				<TabAnchor href="/List" selected={$page.url.pathname === '/List'}>My list</TabAnchor>
+				<TabAnchor href="/" selected={$page.url.pathname === '/'}>Phim mới</TabAnchor>
+				<TabAnchor href="/phim-le" selected={$page.url.pathname === '/phim-le'}>Phim lẻ</TabAnchor>
+				<TabAnchor href="/phim-bo" selected={$page.url.pathname === '/phim-bo'}>Phim bộ</TabAnchor>
+				<TabAnchor href="/tv-shows" selected={$page.url.pathname === '/tv-shows'}>TV Shows</TabAnchor>
+				<TabAnchor href="/hoat-hinh" selected={$page.url.pathname === '/hoat-hinh'}>Hoạt hình</TabAnchor>
 			</TabGroup>
 			<svelte:fragment slot="trail">
 				<a class="btn btn-sm variant-ghost-surface" href="/" target="_blank" rel="noreferrer">
@@ -29,6 +29,9 @@
 				</a>
 				<a class="btn btn-sm variant-ghost-surface" href="/" target="_blank" rel="noreferrer">
 					<List />
+				</a>
+				<a class="btn btn-sm variant-ghost-surface" href="/" target="_blank" rel="noreferrer">
+					<Bookmark />
 				</a>
 				<a class="btn btn-sm variant-ghost-surface" href="/" target="_blank" rel="noreferrer">
 					<History />
@@ -39,6 +42,5 @@
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
-
 	<slot />
 </AppShell>
