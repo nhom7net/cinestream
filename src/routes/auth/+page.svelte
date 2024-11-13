@@ -21,7 +21,7 @@
 	let registerForm: boolean = false;
 </script>
 
-<div class="flex container">
+<div class="flex container justify-center items-center h-full">
 	<div>
 		{#if registerForm === false}
 			<Login {form} />
