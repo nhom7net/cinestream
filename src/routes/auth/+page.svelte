@@ -1,21 +1,22 @@
 <script lang="ts">
-	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
+	import { getToastStore } from '@skeletonlabs/skeleton';
 	import type { ActionData } from './$types.js';
 
 	import Login from './templates/Login.svelte';
 	import Register from './templates/Register.svelte';
 
 	const toastStore = getToastStore();
-	const showToast = (message: string | undefined) => {
-		if (!message) return;
+	const showToast = (success: boolean | undefined, message: string | undefined) => {
+		if (!message || success == undefined) return;
 		toastStore.trigger({
 			message: message,
-			hideDismiss: true
-		} satisfies ToastSettings);
+			hideDismiss: true,
+			background: success ? 'variant-filled-success' : 'variant-filled-primary'
+		});
 	};
 
 	export let form: ActionData;
-	$: form, showToast(form?.message);
+	$: form, showToast(form?.success, form?.message);
 
 	let registerForm: boolean = false;
 </script>

@@ -15,7 +15,7 @@
 	};
 </script>
 
-<h3>Đăng ký</h3>
+<h3 class="text-center">Đăng ký</h3>
 
 <div class="flex flex-col">
 	<form class="flex flex-col flex-center" action="?/register" method="post" use:enhance={handleSubmit}>
@@ -40,6 +40,7 @@
 					class="input"
 					type="text"
 					placeholder="user"
+					value={form?.username?? ''}
 					required
 				/>
 			</div>
@@ -70,6 +71,22 @@
 				<input
 					id="password"
 					name="password"
+					class="input"
+					type="password"
+					placeholder="••••••••"
+					required
+				/>
+			</div>
+		</div>
+		<div class="col-6 form-widget">
+			<label for="password-confirm">
+				<span>Xác nhận lại mật khẩu</span>
+			</label>
+			<div class="s-input-group">
+				<div class="input-group-shim"><LockKeyhole /></div>
+				<input
+					id="password-confirm"
+					name="password-confirm"
 					class="input"
 					type="password"
 					placeholder="••••••••"
