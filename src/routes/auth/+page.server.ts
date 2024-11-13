@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) 
 };
 
 export const actions: Actions = {
-	default: async (event) => {
+	login: async (event) => {
 		const {
 			url,
 			request,
@@ -22,18 +22,20 @@ export const actions: Actions = {
 		} = event;
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
+		const password = formData.get('password') as string;
 		const validEmail = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email);
 
 		if (!validEmail) {
 			return fail(400, { errors: { email: 'Please enter a valid email address' }, email });
 		}
 
-		const { error } = await supabase.auth.signInWithOtp({ email });
+		const { error } = await supabase.auth.signInWithPassword({ email, password });
 
 		if (error) {
 			return fail(400, {
 				success: false,
 				email,
+				password,
 				message: `There was an issue, Please contact support.`
 			});
 		}
@@ -42,5 +44,9 @@ export const actions: Actions = {
 			success: true,
 			message: 'Please check your email for a magic link to log into the website.'
 		};
+	},
+
+	register: async (event) => {
+		
 	}
 };

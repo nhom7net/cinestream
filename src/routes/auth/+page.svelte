@@ -1,56 +1,42 @@
-<!-- src/routes/+page.svelte -->
 <script lang="ts">
-	import { enhance } from '$app/forms'
-	import type { ActionData, SubmitFunction } from './$types.js'
+	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
+	import type { ActionData } from './$types.js';
+
+	import Login from './templates/Login.svelte';
+	import Register from './templates/Register.svelte';
+
+	const toastStore = getToastStore();
+	const showToast = (message: string | undefined) => {
+		if (!message) return;
+		toastStore.trigger({
+			message: message,
+			hideDismiss: true
+		} satisfies ToastSettings);
+	};
 
 	export let form: ActionData;
+	$: form, showToast(form?.message);
 
-	let loading = false
-
-	const handleSubmit: SubmitFunction = () => {
-		loading = true
-		return async ({ update }) => {
-			update()
-			loading = false
-		}
-	}
+	let registerForm: boolean = false;
 </script>
 
-<svelte:head>
-	<title>User Management</title>
-</svelte:head>
-
-<h1>TODO: Viết lại trang này</h1>
-
-<form class="row flex flex-center" method="POST" use:enhance={handleSubmit}>
-	<div class="col-6 form-widget">
-		<h1 class="header">Supabase + SvelteKit</h1>
-		<p class="description">Sign in via magic link with your email below</p>
-		{#if form?.message !== undefined}
-		<div class="success {form?.success ? '' : 'fail'}">
-			{form?.message}
-		</div>
+<div class="flex container">
+	<div>
+		{#if registerForm === false}
+			<Login {form} />
+		{:else if registerForm === true}
+			<Register {form} />
 		{/if}
+
 		<div>
-			<label for="email">Email address</label>
-			<input
-				id="email"
-				name="email"
-				class="inputField"
-				type="email"
-				placeholder="Your email"
-				value={form?.email ?? ''}
-			/>
-		</div>
-		{#if form?.errors?.email}
-		<span class="flex items-center text-sm error">
-			{form?.errors?.email}
-		</span>
-		{/if}
-		<div>
-			<button class="button primary block">
-				{ loading ? 'Loading' : 'Send magic link' }
+			<button
+				class="variant-filled-tertiary w-full"
+				on:click={() => {
+					registerForm = !registerForm;
+				}}
+			>
+				{registerForm ? 'Đã có tài khoản?' : 'Đăng ký'}
 			</button>
 		</div>
 	</div>
-</form>
+</div>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.postcss';
-	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
+	import { AppShell, AppBar, initializeStores, Toast } from '@skeletonlabs/skeleton';
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
 	import { Search, History, List, UserRound, Bookmark } from 'lucide-svelte';
@@ -8,6 +8,8 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
+
+	initializeStores();
 
 	export let data;
 
@@ -26,6 +28,8 @@
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 </script>
+
+<Toast />
 
 <AppShell>
 	<svelte:fragment slot="header">
