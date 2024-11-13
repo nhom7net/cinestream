@@ -16,7 +16,7 @@
 	};
 </script>
 
-<h3>Đăng nhập</h3>
+<h3 class="text-center">Đăng nhập</h3>
 
 <div class="flex flex-col">
 	<form class="flex flex-center w-full" action="?/login" method="POST" use:enhance={handleSubmit}>
@@ -38,11 +38,6 @@
 					/>
 				</div>
 			</div>
-			{#if form?.errors?.email}
-				<span class="flex items-center text-sm error">
-					{form?.errors?.email}
-				</span>
-			{/if}
 			<div>
 				<label for="password">
 					<span>Mật khẩu</span>
@@ -55,7 +50,6 @@
 						class="input"
 						type="password"
 						placeholder="••••••••"
-						value={form?.password ?? ''}
 						required
 					/>
 				</div>
