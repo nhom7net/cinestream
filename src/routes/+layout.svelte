@@ -62,7 +62,7 @@
 	// }
 </script>
 
-<Toast position="br"/>
+<Toast position="br" />
 
 <AppShell>
 	<svelte:fragment slot="header">
@@ -70,7 +70,14 @@
 			<svelte:fragment slot="lead">
 				<strong class="text-xl uppercase text-yellow-500">CINESTREAM</strong>
 			</svelte:fragment>
-			<TabGroup>
+			<TabGroup
+				active="variant-filled-primary"
+				hover="hover:variant-soft-primary"
+				flex="flex-1 lg:flex-none"
+				rounded=""
+				border=""
+				class="bg-surface-100-800-token w-full"
+			>
 				<TabAnchor href="/" selected={$page.url.pathname === '/'}>Phim mới</TabAnchor>
 				<TabAnchor href="/phim-le" selected={$page.url.pathname === '/phim-le'}>Phim lẻ</TabAnchor>
 				<TabAnchor href="/phim-bo" selected={$page.url.pathname === '/phim-bo'}>Phim bộ</TabAnchor>
