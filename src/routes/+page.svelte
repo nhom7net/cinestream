@@ -4,7 +4,7 @@
 	import { Paginator, type PaginationSettings } from '@skeletonlabs/skeleton';
 
 	let movies: any = { items: [], pagination: {} };
-	let currentPage = 1;
+	let currentPage = 0;
 
 	let paginationSettings = {
 		page: currentPage,
