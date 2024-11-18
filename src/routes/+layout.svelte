@@ -133,4 +133,5 @@
 
 {/if}
 	<slot />
+	<div class="py-10"></div>
 </AppShell>
