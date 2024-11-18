@@ -68,4 +68,5 @@
 		</AppBar>
 	</svelte:fragment>
 	<slot />
+	<div class="py-10"></div>
 </AppShell>
