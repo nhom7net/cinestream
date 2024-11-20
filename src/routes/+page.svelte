@@ -14,21 +14,6 @@
 	} satisfies PaginationSettings;
 
 	$: paginationSettings;
-	import { onMount } from 'svelte';
-	import MovieCard from '../components/MovieCard.svelte';
-	import { Paginator, type PaginationSettings } from '@skeletonlabs/skeleton';
-
-	let movies: any = { items: [], pagination: {} };
-	let currentPage = 0;
-
-	let paginationSettings = {
-		page: currentPage,
-		limit: 20,
-		size: 1,
-		amounts: [20]
-	} satisfies PaginationSettings;
-
-	$: paginationSettings;
 
 	// Hàm gọi API
 	async function fetchMovies(page: number) {
