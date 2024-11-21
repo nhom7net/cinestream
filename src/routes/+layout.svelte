@@ -1,6 +1,13 @@
 <script lang="ts">
 	import '../app.postcss';
-	import { AppShell, AppBar, initializeStores, Toast } from '@skeletonlabs/skeleton';
+	import {
+		AppShell,
+		AppBar,
+		initializeStores,
+		Toast,
+		type PopupSettings,
+		popup
+	} from '@skeletonlabs/skeleton';
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
 	import { Search, History, List, UserRound, Bookmark } from 'lucide-svelte';
@@ -27,6 +34,42 @@
 	});
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
+	let keyword: string = '';
+	let searchSuggestion: any[] = [];
+
+	const searchResultPopup: PopupSettings = {
+		event: 'focus-blur',
+		target: 'searchResultPopup',
+		placement: 'bottom'
+	};
+
+	$: keyword, searchSuggestion;
+
+	const debounce = (callback: Function, wait = 300) => {
+		let timeout: ReturnType<typeof setTimeout>;
+
+		return (...args: any[]) => {
+			clearTimeout(timeout);
+			timeout = setTimeout(() => callback(...args), wait);
+		};
+	};
+
+	async function handleSearch() {
+		if (keyword.length <= 0) {
+			searchSuggestion = [];
+            return;
+		}
+
+		try {
+			const response = await fetch(
+				`https://phimapi.com/v1/api/tim-kiem?keyword=${keyword}&limit=5`
+			);
+			const data = await response.json();
+			searchSuggestion = data.data.items;
+		} catch (err) {
+			console.error('Error fetching search data:', err);
+		}
+	}
 </script>
 
 <Toast position="br" />
@@ -56,9 +99,18 @@
 				>
 			</TabGroup>
 			<svelte:fragment slot="trail">
-				<a class="btn btn-sm variant-ghost-surface" href="/" target="_blank" rel="noreferrer">
-					<Search />
-				</a>
+				<!-- Search Input and Icon -->
+				<div class="relative" use:popup={searchResultPopup}>
+					<input
+						type="text"
+						class="input input-bordered"
+						placeholder="Search..."
+						bind:value={keyword}
+						on:keyup={debounce(handleSearch)}
+					/>
+					<Search class="absolute right-2 top-2 text-gray-500" />
+				</div>
+				<!-- Other icons for navigation -->
 				<a class="btn btn-sm variant-ghost-surface" href="/" target="_blank" rel="noreferrer">
 					<List />
 				</a>
@@ -74,6 +126,33 @@
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
+	<!-- Search Result Dialog popups-->
+	<div class="z-50" data-popup="searchResultPopup">
+		{#if searchSuggestion.length > 0}
+			<div class="card p-4 variant-filled-surface">
+				<ul>
+					{#each searchSuggestion as suggestion}
+						<li class="p-2 space-x-2 rounded hover:variant-ghost-primary">
+							<!-- TODO: Put details URL here. -->
+							<a href={suggestion.url} class="flex gap-2">
+								<img
+									src="https://phimimg.com/{suggestion.poster_url}"
+									alt={suggestion.name}
+									class="w-12 h-16 rounded object-cover"
+								/>
+								<div>
+									<span>{suggestion.name}</span>
+									<br />
+									<span class="text-gray-500">{suggestion.year}</span>
+								</div>
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
+	</div>
+
 	<slot />
 	<div class="py-10"></div>
 </AppShell>

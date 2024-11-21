@@ -51,7 +51,6 @@
 		await loadMovies(currentPage);
 	});
 
-	
 	// Function that calls when page number is changed.
 	function pageChanged(event: CustomEvent<number>) {
 		movies.data = [];
@@ -59,19 +58,21 @@
 	}
 </script>
 
-<div class="flex flex-wrap gap-6 justify-center pt-10">
-	{#if movies.items && movies.items.length > 0}
+{#if movies.items && movies.items.length > 0}
+	<div class="grid grid-cols-4 gap-y-6 my-6 px-24 justify-items-center justify-evenly items-center">
 		{#each movies.items as data}
 			<MovieCard {data} />
 		{/each}
-		<Paginator
-			bind:settings={paginationSettings}
-			showNumerals
-			select="hidden"
-			justify="justify-center"
-			on:page={pageChanged}
-		/>
-	{:else}
+	</div>
+	<Paginator
+		bind:settings={paginationSettings}
+		showNumerals
+		select="hidden"
+		justify="justify-center"
+		on:page={pageChanged}
+	/>
+{:else}
+	<div class="flex justify-center align-middle items-center h-full">
 		<p class="text-center text-gray-400">Đang tải dữ liệu</p>
-	{/if}
-</div>
+	</div>
+{/if}
