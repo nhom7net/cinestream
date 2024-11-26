@@ -134,7 +134,7 @@
 					{#each searchSuggestion as suggestion}
 						<li class="p-2 space-x-2 rounded hover:variant-ghost-primary">
 							<!-- TODO: Put details URL here. -->
-							<a href={suggestion.url} class="flex gap-2">
+							<a href="/details/{suggestion.slug}" class="flex gap-2">
 								<img
 									src="https://phimimg.com/{suggestion.poster_url}"
 									alt={suggestion.name}
