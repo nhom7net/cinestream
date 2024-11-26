@@ -9,6 +9,7 @@
 
 	const handleSubmit: SubmitFunction = () => {
 		loading = true;
+		
 		return async ({ update }) => {
 			update();
 			loading = false;
@@ -16,7 +17,8 @@
 	};
 </script>
 
-<h3 class="text-center">Đăng nhập</h3>
+<h2 class="h2">Đăng nhập</h2>
+<div class="py-2" />
 
 <div class="flex flex-col">
 	<form class="flex flex-center w-full" action="?/login" method="POST" use:enhance={handleSubmit}>

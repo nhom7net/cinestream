@@ -53,7 +53,7 @@
 
 	// Function that calls when page number is changed.
 	function pageChanged(event: CustomEvent<number>) {
-		movies.data = [];
+		movies.items = [];
 		loadMovies(event.detail);
 	}
 </script>

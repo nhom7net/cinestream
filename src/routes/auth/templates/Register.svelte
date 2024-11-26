@@ -15,7 +15,8 @@
 	};
 </script>
 
-<h3 class="text-center">Đăng ký</h3>
+<h2 class="h2">Đăng ký</h2>
+<div class="py-2" />
 
 <div class="flex flex-col">
 	<form class="flex flex-col flex-center" action="?/register" method="post" use:enhance={handleSubmit}>
