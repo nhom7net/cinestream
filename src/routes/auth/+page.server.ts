@@ -5,7 +5,6 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) => {
 	const { session } = await safeGetSession();
 
-	// if the user is already logged in return them to the account page
 	if (session) {
 		redirect(303, '/');
 	}
@@ -14,12 +13,7 @@ export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) 
 };
 
 export const actions: Actions = {
-	login: async (event) => {
-		const {
-			url,
-			request,
-			locals: { supabase }
-		} = event;
+	login: async ({ url, request, locals: { supabase, safeGetSession } }) => {
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
@@ -41,16 +35,11 @@ export const actions: Actions = {
 
 		return {
 			success: true,
-			message: 'Đăng nhập thành công!',
+			message: 'Đăng nhập thành công!'
 		};
 	},
 
-	register: async (event) => {
-		const {
-			url,
-			request,
-			locals: { supabase }
-		} = event;
+	register: async ({ url, request, locals: { supabase, safeGetSession } }) => {
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
 		const username = formData.get('username') as string;
@@ -60,14 +49,14 @@ export const actions: Actions = {
 
 		if (password.length < 8) {
 			return fail(400, {
-                success: false,
-                message: 'Mật khẩu phải có ít nhất 8 ký tự!',
-                email,
-                username,
-                displayName
-            });
+				success: false,
+				message: 'Mật khẩu phải có ít nhất 8 ký tự!',
+				email,
+				username,
+				displayName
+			});
 		}
-		
+
 		if (password !== confirmPassword) {
 			return fail(400, {
 				success: false,
@@ -91,19 +80,27 @@ export const actions: Actions = {
 		}
 
 		try {
-			await supabase.auth.signUp({ email, password });
-			await supabase.from('profiles').insert({
-				full_name: displayName,
-				username
-			});
-		} catch (e) {
-			console.error(e);
+			const res: any = await supabase.auth.signUp({ email, password });
+			if (res.error.code === "user_already_exists") throw new Error("Email này đã được sử dụng!");
+
+			const { session } = await safeGetSession();
+
+			if (!session) throw new Error("Không thể đăng ký ngay bây giờ.");
+
+			await supabase
+				.from('profiles')
+				.update({
+					full_name: displayName,
+					username
+				})
+				.eq('id', session.user.id);
+		} catch (e: any) {
 			return fail(400, {
 				success: false,
 				email,
 				username,
 				displayName,
-				message: `Không thể đăng ký ngay bây giờ.`
+				message: e.message
 			});
 		}
 
