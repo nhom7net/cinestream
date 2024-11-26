@@ -6,7 +6,7 @@
     <h1 class="pt-10 pb-5 text-3xl font-bold text-center text-orange-400">{data.origin_name}</h1>
 
     <div class="mb-6 flex items-center space-x-4">
-        <img src={data.poster} alt={data.name} class="w-56 h-80 rounded-md" />
+        <img src={data.poster} alt={data.name} class="w-52 h-80 rounded-md" />
 
         <div class="flex flex-col pl-10">
             <p class="text-xl font-bold mb-2">{data.name}</p>
