@@ -6,7 +6,9 @@
 		initializeStores,
 		Toast,
 		type PopupSettings,
-		popup
+		popup,
+		ListBox,
+		ListBoxItem
 	} from '@skeletonlabs/skeleton';
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
@@ -43,6 +45,12 @@
 		placement: 'bottom'
 	};
 
+	const userDialogPopup: PopupSettings = {
+		event: 'click',
+		target: 'userDialogPopup',
+		placement: 'bottom'
+	};
+
 	$: keyword, searchSuggestion;
 
 	const debounce = (callback: Function, wait = 300) => {
@@ -57,7 +65,7 @@
 	async function handleSearch() {
 		if (keyword.length <= 0) {
 			searchSuggestion = [];
-            return;
+			return;
 		}
 
 		try {
@@ -111,18 +119,22 @@
 					<Search class="absolute right-2 top-2 text-gray-500" />
 				</div>
 				<!-- Other icons for navigation -->
-				<a class="btn btn-sm variant-ghost-surface" href="/" target="_blank" rel="noreferrer">
-					<List />
-				</a>
-				<a class="btn btn-sm variant-ghost-surface" href="/" target="_blank" rel="noreferrer">
-					<Bookmark />
-				</a>
-				<a class="btn btn-sm variant-ghost-surface" href="/" target="_blank" rel="noreferrer">
-					<History />
-				</a>
-				<a class="btn btn-sm variant-ghost-surface" href="/auth">
-					<UserRound />
-				</a>
+				{#if session}
+					<a class="btn btn-sm variant-ghost-surface" href="/list">
+						<List />
+					</a>
+					<a class="btn btn-sm variant-ghost-surface" href="/bookmark">
+						<Bookmark />
+					</a>
+					<a class="btn btn-sm variant-ghost-surface" href="/history">
+						<History />
+					</a>
+					<button class="btn-sm variant-ghost-surface" use:popup={userDialogPopup}>
+						<UserRound />
+					</button>
+				{:else}
+					<a class="btn btn-sm variant-filled-primary" href="/auth">Đăng nhập</a>
+				{/if}
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
@@ -130,7 +142,7 @@
 	<div class="z-50" data-popup="searchResultPopup">
 		{#if searchSuggestion.length > 0}
 			<div class="card p-4 variant-filled-surface">
-				<ul>
+				<ul class="list">
 					{#each searchSuggestion as suggestion}
 						<li class="p-2 space-x-2 rounded hover:variant-ghost-primary">
 							<!-- TODO: Put details URL here. -->
@@ -138,7 +150,7 @@
 								<img
 									src="https://phimimg.com/{suggestion.poster_url}"
 									alt={suggestion.name}
-									class="w-12 h-16 rounded object-cover"
+									class="w-12 h-16 rounded-xl object-cover"
 								/>
 								<div>
 									<span>{suggestion.name}</span>
@@ -153,6 +165,15 @@
 		{/if}
 	</div>
 
+	<!-- User button dialog popup -->
+	<div class="z-50 card p-4 variant-filled-surface" data-popup="userDialogPopup">
+		<ul class="list [&>*]:p-2 [&>*]:space-x-2 [&>*]:rounded">
+			<li class="hover:variant-ghost-primary"><a href="/profile">Trang cá nhân</a></li>
+			<li class="hover:variant-ghost-primary"><a href="/auth/signout">Đăng xuất</a></li>
+		</ul>
+	</div>
 	<slot />
-	<div class="py-10"></div>
+	{#if !$page.url.pathname.includes('/auth')}
+		<div class="py-10"></div>
+	{/if}
 </AppShell>
