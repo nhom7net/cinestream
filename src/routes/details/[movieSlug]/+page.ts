@@ -4,7 +4,7 @@ import type { PageLoad } from "./$types";
 export const load: PageLoad = async ({ params, fetch }) => {
 
     const url: string = `https://phimapi.com/phim/${params.movieSlug}`;
-    
+
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`Failed to fetch data: ${response.statusText}`);
@@ -13,6 +13,7 @@ export const load: PageLoad = async ({ params, fetch }) => {
     const data = await response.json();
 
     return {
+        slug: params.movieSlug,
         name: data.movie.name,
         poster: data.movie.poster_url,
         origin_name: data.movie.origin_name,
@@ -31,6 +32,6 @@ export const load: PageLoad = async ({ params, fetch }) => {
                 link_embed: ep.link_embed,
                 link_m3u8: ep.link_m3u8
             }))
-    };    
+    };
 };
 
