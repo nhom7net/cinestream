@@ -22,6 +22,7 @@ export const load: PageLoad = async ({ params, fetch }) => {
         episode_current: data.movie.episode_current,
         time: data.movie.time,
         quality: data.movie.quality,
+        film: params.movieSlug,
         episode: data.episodes
             .flatMap((ep: { server_data: any[] }) => ep.server_data)
             .map((ep: { name: string; slug: string; filename: string; link_embed: string; link_m3u8: string }) => ({
