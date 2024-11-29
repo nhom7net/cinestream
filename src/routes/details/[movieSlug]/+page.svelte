@@ -1,27 +1,24 @@
 <script lang="ts">
-<<<<<<< HEAD
 	export let data;
-    const supabase = data.supabase;
 
-	async function addToFavorites(movieId: string) {
-        console.log("addToFavorites");
+	let { session, supabase } = data;
+	$: ({ session, supabase } = data);
+
+	async function addToFavorites() {
+		console.log('addToFavorites');
 		const user = data.session?.user.id; // Lấy thông tin người dùng hiện tại
 		if (!user) {
 			alert('Bạn cần đăng nhập để thêm phim vào danh sách yêu thích!');
 			return;
 		}
-        try {
-            const { data: insertedData, error } = await supabase
-			.from('favorites')
-			.insert([{ user_id: user, movie_id: movieId }]);
-        } catch (error) {
-            console.error(error);
-        }
-=======
-	import Link_2 from 'lucide-svelte/icons/link-2';
-
-	export let data;
-	const supabase = data.supabase;
+		try {
+			const { data: insertedData, error } = await supabase
+				.from('favorites')
+				.insert([{ user_id: user, movie_id: data.slug }]);
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
 	async function saveHistory(episode: any, links: any) {
 		console.log('saveHistory');
@@ -32,7 +29,7 @@
 		try {
 			const { data: addData, error } = await supabase
 				.from('history')
-				.insert([{ user: user, movie: data.film, episodes: episode , link: links}]);
+				.insert([{ user: user, movie: data.film, episodes: episode, link: links }]);
 
 			console.log('Payload to Supabase:', {
 				user: user,
@@ -43,7 +40,6 @@
 		} catch (error) {
 			console.error(error);
 		}
->>>>>>> origin/main
 	}
 </script>
 
@@ -89,18 +85,12 @@
 			</div>
 			<div class="flex space-x-4">
 				<button class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10">Xem phim</button>
-<<<<<<< HEAD
 				<button
 					class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
-					on:click={() => addToFavorites(data.slug)}
+					on:click={addToFavorites}
 				>
 					Yêu thích
 				</button>
-=======
-				<button class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
-					>Yêu thích</button
-				>
->>>>>>> origin/main
 			</div>
 		</div>
 	</div>
@@ -113,14 +103,10 @@
 					<div class="flex w-20">
 						<button
 							class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-<<<<<<< HEAD
-							on:click={() => window.open(ep.link_embed, '_blank')}
-=======
 							on:click={() => {
 								saveHistory(ep.name, ep.link_embed);
 								window.open(ep.link_embed, '_blank');
 							}}
->>>>>>> origin/main
 						>
 							{ep.name}
 						</button>
