@@ -17,6 +17,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
+	import Avatar from '$lib/Avatar.svelte';
 
 	initializeStores();
 
@@ -80,7 +81,7 @@
 	}
 </script>
 
-<Toast position="br" />
+<Toast position="bl" />
 
 <AppShell>
 	<svelte:fragment slot="header">
@@ -111,7 +112,7 @@
 				<div class="relative" use:popup={searchResultPopup}>
 					<input
 						type="text"
-						class="input input-bordered"
+						class="input"
 						placeholder="Search..."
 						bind:value={keyword}
 						on:keyup={debounce(handleSearch)}
@@ -129,8 +130,8 @@
 					<a class="btn btn-sm variant-ghost-surface" href="/history">
 						<History />
 					</a>
-					<button class="btn-sm variant-ghost-surface" use:popup={userDialogPopup}>
-						<UserRound />
+					<button class="p-0 m-0" use:popup={userDialogPopup}>
+						<Avatar {supabase} url={data.avatar} size="w-12" />
 					</button>
 				{:else}
 					<a class="btn btn-sm variant-filled-primary" href="/auth">Đăng nhập</a>

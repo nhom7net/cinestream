@@ -9,6 +9,7 @@
 
 	const toastStore = getToastStore();
 	const showToast = (success: boolean | undefined, message: string | undefined) => {
+		console.log(form);
 		if (!message || success == undefined) return;
 		toastStore.trigger({
 			message: message,

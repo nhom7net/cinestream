@@ -1,78 +1,60 @@
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
+	import { getToastStore, ListBox, ListBoxItem } from '@skeletonlabs/skeleton';
+	import Profile from './templates/Profile.svelte';
+	import Account from './templates/Account.svelte';
+	import type { ActionData } from './$types';
 
 	export let data;
-	export let form;
 
 	let { session, supabase, profile } = data;
 	$: ({ session, supabase, profile } = data);
 
-	let profileForm: HTMLFormElement;
+	const toastStore = getToastStore();
+
 	let loading = false;
-	let fullName: string = profile?.full_name ?? '';
-	let username: string = profile?.username ?? '';
-	let website: string = profile?.website ?? '';
-	let avatarUrl: string = profile?.avatar_url ?? '';
+	let tabSet: string = 'profile';
 
 	const handleSubmit: SubmitFunction = () => {
 		loading = true;
 		return async () => {
 			loading = false;
+			toastStore.trigger({
+				message: '✅ Cập nhật thành công!',
+				background: 'variant-filled-success',
+				hideDismiss: true
+			});
 		};
 	};
 
-	const handleSignOut: SubmitFunction = () => {
-		loading = true;
-		return async ({ update }) => {
-			loading = false;
-			update();
-		};
+	const showToast = (success: boolean | undefined, message: string | undefined) => {
+		console.log(success, message);
+		if (!message || success == undefined) return;
+		toastStore.trigger({
+			message: message || 'Có lỗi xảy ra, hãy thử lại sau!',
+			hideDismiss: true,
+			background: success ? 'variant-filled-success' : 'variant-filled-primary'
+		});
 	};
+
+	export let form: ActionData;
+	$: form, showToast(form?.success, form?.message);
 </script>
 
-<div class="form-widget">
-	<form
-		class="form-widget"
-		method="post"
-		action="?/update"
-		use:enhance={handleSubmit}
-		bind:this={profileForm}
-	>
-		<div>
-			<label for="email">Email</label>
-			<input id="email" type="text" value={session.user.email} disabled />
-		</div>
+<div class="flex gap-20 m-10">
+	<div class="w-60">
+		<ListBox>
+			<ListBoxItem bind:group={tabSet} name="medium" value="profile">Tiểu sử</ListBoxItem>
+			<ListBoxItem bind:group={tabSet} name="medium" value="account">Tài khoản</ListBoxItem>
+		</ListBox>
+	</div>
 
-		<div>
-			<label for="fullName">Full Name</label>
-			<input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName} />
-		</div>
-
-		<div>
-			<label for="username">Username</label>
-			<input id="username" name="username" type="text" value={form?.username ?? username} />
-		</div>
-
-		<div>
-			<label for="website">Website</label>
-			<input id="website" name="website" type="url" value={form?.website ?? website} />
-		</div>
-
-		<div>
-			<input
-				type="submit"
-				class="button block primary"
-				value={loading ? 'Loading...' : 'Update'}
-				disabled={loading}
-			/>
-		</div>
-	</form>
-
-	<form method="post" action="?/signout" use:enhance={handleSignOut}>
-		<div>
-			<button class="button block" disabled={loading}>Sign Out</button>
-		</div>
-	</form>
+	<div>
+		{#if tabSet === 'profile'}
+			<Profile {form} {supabase} {handleSubmit} {loading} {profile} />
+		{:else if tabSet === 'account'}
+			<Account {session} {handleSubmit} {loading} />
+		{/if}
+	</div>
 </div>
