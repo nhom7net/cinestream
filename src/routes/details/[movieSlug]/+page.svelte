@@ -1,8 +1,24 @@
 <script lang="ts">
-	import Link_2 from 'lucide-svelte/icons/link-2';
-
 	export let data;
-	const supabase = data.supabase;
+
+	let { session, supabase } = data;
+	$: ({ session, supabase } = data);
+
+	async function addToFavorites() {
+		console.log('addToFavorites');
+		const user = data.session?.user.id; // Lấy thông tin người dùng hiện tại
+		if (!user) {
+			alert('Bạn cần đăng nhập để thêm phim vào danh sách yêu thích!');
+			return;
+		}
+		try {
+			const { data: insertedData, error } = await supabase
+				.from('favorites')
+				.insert([{ user_id: user, movie_id: data.slug }]);
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
 	async function saveHistory(episode: any, links: any) {
 		console.log('saveHistory');
@@ -13,7 +29,7 @@
 		try {
 			const { data: addData, error } = await supabase
 				.from('history')
-				.insert([{ user: user, movie: data.film, episodes: episode , link: links}]);
+				.insert([{ user: user, movie: data.film, episodes: episode, link: links }]);
 
 			console.log('Payload to Supabase:', {
 				user: user,
@@ -69,9 +85,12 @@
 			</div>
 			<div class="flex space-x-4">
 				<button class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10">Xem phim</button>
-				<button class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
-					>Yêu thích</button
+				<button
+					class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
+					on:click={addToFavorites}
 				>
+					Yêu thích
+				</button>
 			</div>
 		</div>
 	</div>
