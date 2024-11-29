@@ -1,4 +1,5 @@
 <script lang="ts">
+<<<<<<< HEAD
 	export let data;
     const supabase = data.supabase;
 
@@ -16,6 +17,33 @@
         } catch (error) {
             console.error(error);
         }
+=======
+	import Link_2 from 'lucide-svelte/icons/link-2';
+
+	export let data;
+	const supabase = data.supabase;
+
+	async function saveHistory(episode: any, links: any) {
+		console.log('saveHistory');
+		const user = data.session?.user.id;
+		if (!user) {
+			return;
+		}
+		try {
+			const { data: addData, error } = await supabase
+				.from('history')
+				.insert([{ user: user, movie: data.film, episodes: episode , link: links}]);
+
+			console.log('Payload to Supabase:', {
+				user: user,
+				movie: data.film,
+				episodes: episode,
+				link: links
+			});
+		} catch (error) {
+			console.error(error);
+		}
+>>>>>>> origin/main
 	}
 </script>
 
@@ -61,12 +89,18 @@
 			</div>
 			<div class="flex space-x-4">
 				<button class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10">Xem phim</button>
+<<<<<<< HEAD
 				<button
 					class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
 					on:click={() => addToFavorites(data.slug)}
 				>
 					Yêu thích
 				</button>
+=======
+				<button class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
+					>Yêu thích</button
+				>
+>>>>>>> origin/main
 			</div>
 		</div>
 	</div>
@@ -79,7 +113,14 @@
 					<div class="flex w-20">
 						<button
 							class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+<<<<<<< HEAD
 							on:click={() => window.open(ep.link_embed, '_blank')}
+=======
+							on:click={() => {
+								saveHistory(ep.name, ep.link_embed);
+								window.open(ep.link_embed, '_blank');
+							}}
+>>>>>>> origin/main
 						>
 							{ep.name}
 						</button>
