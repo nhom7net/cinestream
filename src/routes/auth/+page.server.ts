@@ -81,7 +81,7 @@ export const actions: Actions = {
 
 		try {
 			const res: any = await supabase.auth.signUp({ email, password });
-			if (res.error.code === "user_already_exists") throw new Error("Email này đã được sử dụng!");
+			if (res.error?.code === "user_already_exists") throw new Error("Email này đã được sử dụng!");
 
 			const { session } = await safeGetSession();
 
