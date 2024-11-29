@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ url, locals: { safeGetSession, supa
 		throw redirect(303, '/');
 	}
 
-	const { data } = await supabase.from("history").select("user,movie,watched_at,episodes").eq("user", session.user.id);
+	const { data } = await supabase.from("history").select("user,movie,watched_at,episodes,link").eq("user", session.user.id);
 
   /// handle data film
 	const history = await Promise.all(
@@ -21,7 +21,8 @@ export const load: PageServerLoad = async ({ url, locals: { safeGetSession, supa
 				name: moviedata.movie.name,
 				poster: moviedata.movie.poster_url,
 				episode: element.episodes,
-				time: element.watched_at
+				time: element.watched_at,
+				link: element.link
 			};
 		})
 	);

@@ -4,7 +4,7 @@
 	export let data;
 	const supabase = data.supabase;
 
-	async function saveHistory(episode: any) {
+	async function saveHistory(episode: any, links: any) {
 		console.log('saveHistory');
 		const user = data.session?.user.id;
 		if (!user) {
@@ -13,11 +13,13 @@
 		try {
 			const { data: addData, error } = await supabase
 				.from('history')
-				.insert([{ user: user, movie: data.film, episodes: episode }]);
+				.insert([{ user: user, movie: data.film, episodes: episode , link: links}]);
+
 			console.log('Payload to Supabase:', {
 				user: user,
 				movie: data.film,
-				episodes: episode
+				episodes: episode,
+				link: links
 			});
 		} catch (error) {
 			console.error(error);
@@ -83,7 +85,7 @@
 						<button
 							class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
 							on:click={() => {
-								saveHistory(ep.name);
+								saveHistory(ep.name, ep.link_embed);
 								window.open(ep.link_embed, '_blank');
 							}}
 						>
