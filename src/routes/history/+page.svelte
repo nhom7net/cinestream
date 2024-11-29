@@ -9,19 +9,15 @@
 	{:else}
 		<ul class="space-y-4">
 			{#each data.history as movie (movie.time)}
-				<li class="p-2 space-x-2 rounded hover:bg-gray-100 flex items-center">
+				<li class="p-2 space-x-2 rounded flex items-center hover:bg-transparent">
 					<a href={movie.link} class="movie-link flex justify-center items-center gap-4">
-					<img
-						src="{movie.poster}"
-						alt="{movie.name}"
-						class="w-32 h-40 rounded object-cover"
-					/>
-					<div class="flex flex-col">
-						<span class="text-xl font-bold text-center">{movie.name}</span>
-						<span class="text-xl font-bold text-center">{movie.episode}</span>
-					</div>
-				</a>
-				</li>		
+						<img src={movie.poster} alt={movie.name} class="w-48 h-64 rounded object-cover" />
+						<div class="flex flex-col">
+							<span class="text-2xl font-bold text-center">{movie.name}</span>
+							<span class="text-2xl font-bold text-center">{movie.episode}</span>
+						</div>
+					</a>
+				</li>
 			{/each}
 		</ul>
 	{/if}
