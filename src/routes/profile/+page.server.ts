@@ -20,6 +20,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 
 export const actions: Actions = {
 	profile: async ({ request, locals: { supabase, safeGetSession } }) => {
+		console.info("[profile:profile] form submitted");
 		const formData = await request.formData();
 		const { session } = await safeGetSession();
 
@@ -35,13 +36,16 @@ export const actions: Actions = {
 			updated_at: new Date()
 		});
 
-		if (error)
+		if (error) {
+			console.log(`[profile] failure: ${error.message}`);
 			return fail(500, {
 				success: false,
 				userInfo,
 				message: 'Có lổi xảy ra, vui lòng thử lại sau!'
 			});
+		}
 
+		console.info("[profile:profile] OK!");
 		return {
 			sucess: true,
 			userInfo
@@ -49,6 +53,7 @@ export const actions: Actions = {
 	},
 
 	account: async ({ request, locals: { supabase } }) => {
+		console.info("[profile:account] form submitted");
 		const formData = await request.formData();
 		let error: AuthError | null;
 
@@ -65,6 +70,7 @@ export const actions: Actions = {
 		});
 		
 		if (!response.data) {
+			console.error("[profile:account] credential failure. User password might be incorrect.");
 			return fail(400, {
 				success: false,
 				accountInfo,
@@ -73,6 +79,7 @@ export const actions: Actions = {
 		}
 
 		if (accountInfo.old_password === accountInfo.password) {
+			console.error("[profile:account] password is unchanged. Stop.");
 			return fail(400, {
 				success: false,
 				accountInfo,
@@ -82,6 +89,7 @@ export const actions: Actions = {
 
 		// if no new password provided, simply ignore password change
 		if (accountInfo.password.length > 0) {
+			console.info("[profile:account] requesting email and password change...");
 			const { error: e } = await supabase.auth.updateUser({
 				email: accountInfo.email,
 				password: accountInfo.password
@@ -89,6 +97,7 @@ export const actions: Actions = {
 
 			error = e;
 		} else {
+			console.info("[profile:account] requesting email change...");
 			const { error: e } = await supabase.auth.updateUser({
 				email: accountInfo.email
 			});
@@ -97,6 +106,7 @@ export const actions: Actions = {
 		}
 
 		if (error) {
+			console.info(`[profile:account] failure: ${error.message}`);
 			return fail(500, {
 				success: false,
 				accountInfo,
@@ -104,6 +114,7 @@ export const actions: Actions = {
 			});
 		}
 
+		console.info("[profile:account] OK!");
 		return {
 			success: true,
 			accountInfo

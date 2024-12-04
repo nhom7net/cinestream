@@ -21,7 +21,7 @@
 		return async () => {
 			loading = false;
 			toastStore.trigger({
-				message: '✅ Cập nhật thành công!',
+				message: 'Cập nhật thành công!',
 				background: 'variant-filled-success',
 				hideDismiss: true
 			});
