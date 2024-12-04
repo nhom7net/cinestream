@@ -13,9 +13,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 			 * standard behavior.
 			 */
 			setAll: (cookiesToSet: any) => {
-    cookiesToSet.forEach(({ name, value, options }: { name: string; value: string; options: any }) => {
-        event.cookies.set(name, value, { ...options, path: '/' });
-    });
+				cookiesToSet.forEach(
+					({ name, value, options }: { name: string; value: string; options: any }) => {
+						event.cookies.set(name, value, { ...options, path: '/' });
+					}
+				);
 			}
 		}
 	});
@@ -50,4 +52,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 			return name === 'content-range' || name === 'x-supabase-api-version';
 		}
 	});
+};
+
+// attempting to silent the supabase warning
+const originalConsoleWarn = console.warn;
+console.warn = function (...args) {
+	const shouldLog = args.every((arg) => {
+		if (typeof arg === 'string') {
+			return !arg.includes('Using the user object');
+		}
+		return true;
+	});
+	if (shouldLog) {
+		originalConsoleWarn.apply(console, args);
+	}
 };
