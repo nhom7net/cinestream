@@ -1,20 +1,26 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
-	import type { SubmitFunction } from "../$types";
+	import type { ActionData, SubmitFunction } from "../$types";
     import AvatarUpload from './AvatarUpload.svelte';
 	import Avatar from '$lib/Avatar.svelte';
 	import type { SupabaseClient } from "@supabase/supabase-js";
 
-    export let form;
+    export let form: ActionData;
     export let supabase: SupabaseClient;
     export let loading: boolean;
     export let profile;
-    export let handleSubmit: SubmitFunction;
 
     let profileForm: HTMLFormElement;
 	let fullName: string = profile?.full_name ?? '';
 	let username: string = profile?.username ?? '';
 	let avatarUrl: string = profile?.avatar_url ?? '';
+
+	const handleSubmit: SubmitFunction = () => {
+		loading = true;
+		return async () => {
+			loading = false;
+		};
+	};
 
 </script>
 

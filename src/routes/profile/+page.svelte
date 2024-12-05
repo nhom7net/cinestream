@@ -1,6 +1,5 @@
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
-	import type { SubmitFunction } from '@sveltejs/kit';
 	import { getToastStore, ListBox, ListBoxItem } from '@skeletonlabs/skeleton';
 	import Profile from './templates/Profile.svelte';
 	import Account from './templates/Account.svelte';
@@ -16,20 +15,8 @@
 	let loading = false;
 	let tabSet: string = 'profile';
 
-	const handleSubmit: SubmitFunction = () => {
-		loading = true;
-		return async () => {
-			loading = false;
-			toastStore.trigger({
-				message: 'Cập nhật thành công!',
-				background: 'variant-filled-success',
-				hideDismiss: true
-			});
-		};
-	};
-
 	const showToast = (success: boolean | undefined, message: string | undefined) => {
-		console.log(success, message);
+		console.log(form);
 		if (!message || success == undefined) return;
 		toastStore.trigger({
 			message: message || 'Có lỗi xảy ra, hãy thử lại sau!',
@@ -52,9 +39,9 @@
 
 	<div>
 		{#if tabSet === 'profile'}
-			<Profile {form} {supabase} {handleSubmit} {loading} {profile} />
+			<Profile {form} {supabase} {loading} {profile} />
 		{:else if tabSet === 'account'}
-			<Account {session} {handleSubmit} {loading} />
+			<Account {session} {loading} />
 		{/if}
 	</div>
 </div>
