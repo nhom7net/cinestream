@@ -5,12 +5,29 @@
 	$: ({ session, supabase } = data);
 
 	async function addToFavorites() {
-		console.log('addToFavorites');
 		const user = data.session?.user.id; // Lấy thông tin người dùng hiện tại
 		if (!user) {
 			alert('Bạn cần đăng nhập để thêm phim vào danh sách yêu thích!');
 			return;
 		}
+
+		try {
+			// Kiểm tra xem bộ phim đã có trong danh sách yêu thích của người dùng chưa
+			const { data: existingFavorite, error: checkError } = await supabase
+				.from('favorites')
+				.select('user_id, movie_id')
+				.eq('user_id', user)
+				.eq('movie_id', data.slug) // Kiểm tra theo movie_id
+				.single(); // Lấy một kết quả duy nhất
+			
+			if (existingFavorite) {
+				alert('Bộ phim này đã có trong danh sách yêu thích của bạn!');
+				return; // Nếu bộ phim đã có trong danh sách, không thêm lại
+			}
+		} catch (error){
+			console.error(error);
+		}
+
 		try {
 			const { data: insertedData, error } = await supabase
 				.from('favorites')
