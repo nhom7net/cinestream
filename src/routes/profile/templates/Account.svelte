@@ -1,11 +1,17 @@
 <script lang="ts">
-	import type { SubmitFunction } from '../$types';
+	import type { ActionData, SubmitFunction } from '../$types';
 	import { enhance } from '$app/forms';
 	import type { Session } from '@supabase/supabase-js';
 
 	export let loading: boolean;
 	export let session: Session;
-	export let handleSubmit: SubmitFunction;
+
+	const handleSubmit: SubmitFunction = () => {
+		loading = true;
+		return async () => {
+			loading = false;
+		};
+	};
 
 	// sanity checking
 	let password: string;
@@ -50,7 +56,13 @@
 >
 	<div>
 		<label for="email">Email</label>
-		<input id="email" name="email" type="text" value={session.user.email} required />
+		<input
+			id="email"
+			name="email"
+			type="text"
+			value={session.user.email}
+			disabled
+		/>
 	</div>
 
 	<div>
