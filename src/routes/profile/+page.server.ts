@@ -35,8 +35,7 @@ export const actions: Actions = {
 			updated_at: new Date()
 		});
 
-		if (error) {
-			console.log(`[profile:profile] failure: ${error.message}`);
+		if (error)
 			return fail(500, {
 				success: false,
 				full_name,
@@ -44,9 +43,7 @@ export const actions: Actions = {
 				avatar_url,
 				message: 'Có lổi xảy ra, vui lòng thử lại sau!'
 			});
-		}
 
-		console.info('[profile:profile] OK!');
 		return {
 			sucesss: true,
 			full_name,
