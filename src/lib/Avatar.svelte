@@ -13,10 +13,14 @@
 	let imageUpload = new ImageHelper(supabase);
 
 	async function downloadAvatar() {
-		if (!url) return;
+		if (!url) {
+			imageUrl = userImage;
+			return;
+		};
 		imageUrl = await imageUpload.downloadImage(url, 'avatars');
 	}
 
+	$: url, downloadAvatar();
 	$: downloadAvatar();
 </script>
 
