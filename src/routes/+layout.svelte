@@ -7,13 +7,10 @@
 		Toast,
 		type PopupSettings,
 		popup,
-		ListBox,
-		ListBoxItem,
-
 		Drawer,
+		getDrawerStore,
 
-		getDrawerStore
-
+		Modal
 
 	} from '@skeletonlabs/skeleton';
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
@@ -93,9 +90,18 @@
 <Toast position="bl" />
 <Drawer>
 	{#if $drawerStore.id === 'user-info'}
-		<UserInfo {supabase} userid={$drawerStore.meta.id}/>
+		<div class="p-4 flex flex-col justify-between items-center h-full">
+			<UserInfo {supabase} userid={$drawerStore.meta.id} />
+			<button
+				class="variant-filled-tertiary w-full"
+				on:click={() => {
+					drawerStore.close();
+				}}>Huỷ</button
+			>
+		</div>
 	{/if}
 </Drawer>
+<Modal />
 
 <AppShell>
 	<svelte:fragment slot="header">

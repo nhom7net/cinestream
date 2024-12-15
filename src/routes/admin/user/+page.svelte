@@ -8,6 +8,8 @@
 	} from '@skeletonlabs/skeleton';
 	import type { PageData } from './$types';
 	import { UserRoundCog } from 'lucide-svelte';
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	export let data: PageData;
 
@@ -16,10 +18,16 @@
 
 	// all of the filters
 	let searchQuery: string = '';
-	let roles: number = 0;
+	let roles: number = 1;
 
 	let filtered: Array<(typeof profiles)[number]> = [];
 	let paginatedSource: Array<(typeof profiles)[number]> = [];
+
+	onMount(() => {
+		setInterval(() => {
+			invalidate('/admin/user');
+		}, 10000);
+	});
 
 	$: filtered = profiles.filter((data) => {
 		const username = data.username.toLowerCase().includes(searchQuery.toLowerCase());
@@ -48,6 +56,12 @@
 		amounts: [6, 10, 20, 30]
 	} satisfies PaginationSettings;
 
+	$: roles,
+		searchQuery,
+		() => {
+			paginationSettings.page = 0;
+		};
+
 	$: filtered,
 		(paginatedSource = filtered.slice(
 			paginationSettings.page * paginationSettings.limit,
@@ -62,12 +76,12 @@
 		width: 'w-[280px] md:w-[480px]',
 		padding: 'p-4',
 		rounded: 'rounded-xl',
-        position: 'right',
+		position: 'right',
 		meta: { id: '' }
 	};
 
 	function openDialog(id: string) {
-        drawerSettings.meta.id = id;
+		drawerSettings.meta.id = id;
 		drawerStore.open(drawerSettings);
 	}
 </script>
@@ -131,7 +145,9 @@
 						</div>
 						<!-- Action buttons -->
 						<div>
-							<button class="variant-ghost-tertiary" on:click={() => openDialog(profile.id)}><UserRoundCog /></button>
+							<button class="variant-ghost-tertiary" on:click={() => openDialog(profile.id)}
+								><UserRoundCog /></button
+							>
 						</div>
 					</li>
 				{/each}
