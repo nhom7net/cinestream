@@ -8,33 +8,40 @@
 
     let searchUsername = '';
     let searchComment = '';
+	let btnCommentReported = false;
 
     let filteredData = [];
     $: filteredData = source.filter((comment) => {
         const filterUsername = comment.profiles.username.toLowerCase().includes(searchUsername.toLowerCase());
         const filterComment = comment.comment.toLowerCase().includes(searchComment.toLowerCase());
-        return filterUsername && filterComment;
-    }
-        
+		const commentReported = btnCommentReported ? comment.report === true : true;
+
+        return filterUsername && filterComment && commentReported;
+    } 
     );
 
-	let paginatedData = [];
-	$: paginatedData = filteredData.slice(
-		paginationSettings.page * paginationSettings.limit,
-		(paginationSettings.page + 1) * paginationSettings.limit
-	);
+	function toggleReportFilter() {
+		btnCommentReported = !btnCommentReported;
+	}
 
+	let paginatedData = [];
 	let paginationSettings = {
 		page: 0,
 		limit: 5,
 		size: filteredData.length,
 		amounts: [5, 10, 15, 20]
 	} satisfies PaginationSettings;
+
+	// Cập nhật lại paginationSettings khi filteredData thay đổi
 	$: paginationSettings.size = filteredData.length;
+
+	$: paginatedData = filteredData.slice(
+		paginationSettings.page * paginationSettings.limit,
+		(paginationSettings.page + 1) * paginationSettings.limit
+	);
 </script>
 
 <h1 class="text-4xl font-bold mt-7 pl-10">Quản lý bình luận</h1>
-
 
 <div class="flex flex-row gap-16 pt-10">
 	<!-- Search and Filter Section -->
@@ -56,8 +63,10 @@
 			/>
 		</div>
 		<div class="space-y-2">
-			<button type="button" class="btn bg-rose-700">Bị báo cáo</button>
-		</div>
+			<button type="button" class="btn bg-rose-700" on:click={toggleReportFilter}>
+			  {btnCommentReported ? 'Hiển thị tất cả' : 'Bị báo cáo'}
+			</button>
+		  </div>
 	</section>
 	{#if paginatedData.length > 0}
 	<!-- Comments Section -->
@@ -98,7 +107,3 @@
 	<p class="text-gray-500 text-center">No comments available.</p>
 	{/if}
 </div>
-
-
-
-
