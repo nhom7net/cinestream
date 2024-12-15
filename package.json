@@ -47,6 +47,7 @@
     "@floating-ui/dom": "1.6.12",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.2",
+    "hls.js": "^1.5.17",
     "lucide-svelte": "^0.454.0"
   }
 }

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	export let data;
 
 	let { session, supabase } = data;
@@ -58,6 +60,10 @@
 			console.error(error);
 		}
 	}
+
+	const goToMovie = (slug: string) => {
+        goto(`/watch/${slug}`);
+    };
 
 	type Comment = {
 		id: string; // id là chuỗi
@@ -211,7 +217,8 @@
 				<p class="text-base font-bold mb-2 ml-1">{data.quality}</p>
 			</div>
 			<div class="flex space-x-4 mt-20">
-				<button class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10">Xem phim</button>
+				<button class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10"
+					on:click={() => goToMovie(data.slug)}>Xem phim</button>
 				<button
 					class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
 					on:click={addToFavorites}
