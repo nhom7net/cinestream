@@ -7,8 +7,11 @@
 		Toast,
 		type PopupSettings,
 		popup,
-		ListBox,
-		ListBoxItem
+		Drawer,
+		getDrawerStore,
+
+		Modal
+
 	} from '@skeletonlabs/skeleton';
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
@@ -18,6 +21,7 @@
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import Avatar from '$lib/Avatar.svelte';
+	import UserInfo from '$lib/UserInfo.svelte';
 
 	initializeStores();
 
@@ -37,6 +41,8 @@
 	});
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
+	const drawerStore = getDrawerStore();
+
 	let keyword: string = '';
 	let searchSuggestion: any[] = [];
 
@@ -82,6 +88,20 @@
 </script>
 
 <Toast position="bl" />
+<Drawer>
+	{#if $drawerStore.id === 'user-info'}
+		<div class="p-4 flex flex-col justify-between items-center h-full">
+			<UserInfo {supabase} userid={$drawerStore.meta.id} />
+			<button
+				class="variant-filled-tertiary w-full"
+				on:click={() => {
+					drawerStore.close();
+				}}>Huỷ</button
+			>
+		</div>
+	{/if}
+</Drawer>
+<Modal />
 
 <AppShell>
 	<svelte:fragment slot="header">
@@ -169,7 +189,10 @@
 	<!-- User button dialog popup -->
 	<div class="z-50 card p-4 variant-filled-surface" data-popup="userDialogPopup">
 		<ul class="list [&>*]:p-2 [&>*]:space-x-2 [&>*]:rounded">
-			<li class="hover:variant-ghost-primary"><a href="/profile">Trang cá nhân</a></li>
+			{#if data.admin}
+				<li class="hover:variant-ghost-primary"><a href="/admin">Admin quản lý</a></li>
+			{/if}
+			<li class="hover:variant-ghost-primary"><a href="/profile">Chỉnh sửa hồ sơ</a></li>
 			<li class="hover:variant-ghost-primary"><a href="/auth/signout">Đăng xuất</a></li>
 		</ul>
 	</div>

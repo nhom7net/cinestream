@@ -6,7 +6,7 @@ export const load: LayoutServerLoad = async ({ locals: { supabase, safeGetSessio
 
 	const { data } = await supabase
 		.from('profiles')
-		.select('avatar_url')
+		.select('avatar_url, isAdmin')
 		.eq('id', session?.user.id)
 		.single();
 
@@ -14,6 +14,7 @@ export const load: LayoutServerLoad = async ({ locals: { supabase, safeGetSessio
 		session,
 		user,
 		avatar: data?.avatar_url || '',
+		admin: data?.isAdmin || false,
 		cookies: cookies.getAll()
 	};
 };

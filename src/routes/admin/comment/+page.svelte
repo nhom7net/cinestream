@@ -12,7 +12,7 @@
 
     let filteredData = [];
     $: filteredData = source.filter((comment) => {
-        const filterUsername = comment.profiles.username.toLowerCase().includes(searchUsername.toLowerCase());
+        const filterUsername = comment.username.toLowerCase().includes(searchUsername.toLowerCase());
         const filterComment = comment.comment.toLowerCase().includes(searchComment.toLowerCase());
 		const commentReported = btnCommentReported ? comment.report === true : true;
 
