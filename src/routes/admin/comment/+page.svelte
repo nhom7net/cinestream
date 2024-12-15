@@ -11,7 +11,7 @@
 
     let filteredData = [];
     $: filteredData = source.filter((comment) => {
-        const filterUsername = comment.profiles.username.toLowerCase().includes(searchUsername.toLowerCase());
+        const filterUsername = comment.username.toLowerCase().includes(searchUsername.toLowerCase());
         const filterComment = comment.comment.toLowerCase().includes(searchComment.toLowerCase());
         return filterUsername && filterComment;
     }
@@ -34,8 +34,6 @@
 </script>
 
 <h1 class="text-4xl font-bold mt-7 pl-10">Quản lý bình luận</h1>
-
-
 <div class="flex flex-row gap-16 pt-10">
 	<!-- Search and Filter Section -->
 	<section class="space-y-4 pl-10">
