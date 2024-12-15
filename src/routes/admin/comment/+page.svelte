@@ -76,8 +76,8 @@
 				<div class="flex flex-row justify-between">
 					<div>
 						<div class="flex flex-row gap-2 items-center text-sm text-amber-500">
-							<p class="font-semibold">{comment.profiles.full_name}</p>
-							<p class="text-gray-400">@{comment.profiles.username}</p>
+							<p class="font-semibold">{comment.full_name}</p>
+							<p class="text-gray-400">@{comment.username}</p>
 						</div>
 						<p class="text-gray-500 text-xs mt-1">Movie ID: {comment.movie_id}</p>
 						<p class="mt-2">{comment.comment}</p>
