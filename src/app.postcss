@@ -1,3 +1,15 @@
+/* === app.postcss ===
+	File này chứa những class được dùng cho mọi component của web.
+
+	Khi sử dụng file này, cần phải tuân theo luật sau:
+	1. Tuyệt đối không được sử dụng "Format Document" của VScode cho file này.
+	2. Tuyệt đối không được thêm 1 class chỉ để dùng cho 1 component.
+		Vui lòng dùng scoped style (dùng thẻ style) trong component muốn sử dụng.
+	3. Nên dùng Tailwind để đặt thuộc tính thay vì viết vanilla CSS.
+
+	Nếu không tuân theo luật trên, Pull Request sẽ bị đóng ngay lập tức.
+*/
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -24,6 +36,9 @@ input[type="text"],
 input[type="url"], 
 input[type="password"] 
 { @apply input }
+
+input[type="checkbox"] { @apply checkbox }
+input[type="radio"] { @apply radio }
 
 /* Skeleton specific styles */
 .s-input-group { @apply input-group input-group-divider grid-cols-[auto_1fr_auto] }

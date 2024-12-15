@@ -21,12 +21,12 @@
 				.eq('user_id', user)
 				.eq('movie_id', data.slug) // Kiểm tra theo movie_id
 				.single(); // Lấy một kết quả duy nhất
-			
+
 			if (existingFavorite) {
 				alert('Bộ phim này đã có trong danh sách yêu thích của bạn!');
 				return; // Nếu bộ phim đã có trong danh sách, không thêm lại
 			}
-		} catch (error){
+		} catch (error) {
 			console.error(error);
 		}
 
@@ -65,6 +65,115 @@
         goto(`/watch/${slug}`);
     };
 
+	type Comment = {
+		id: string; // id là chuỗi
+		user_id: string; // user_id là chuỗi
+		movie_id: string; // movie_id là chuỗi
+		comment: string;
+		created_at: string;
+		profiles: { full_name: string }[];
+	};
+
+	let comments: Comment[] = [];
+	let comment = ''; // Khai báo biến comment
+
+	// Thêm bình luận
+	async function addComment() {
+		if (!session?.user.id) {
+			alert('Bạn cần đăng nhập để gửi bình luận!');
+			return;
+		}
+
+		if (!comment.trim()) {
+			alert('Bình luận không được để trống!');
+			return;
+		}
+
+		try {
+			const { error } = await supabase.from('comments').insert([
+				{
+					user_id: session.user.id, // user_id là chuỗi
+					movie_id: data.slug, // movie_id là chuỗi
+					comment,
+					created_at: new Date().toISOString()
+				}
+			]);
+
+			if (error) {
+				console.error('Error adding comment:', error.message);
+				alert('Không thể gửi bình luận!');
+			} else {
+				alert('Bình luận của bạn đã được gửi!');
+				comment = ''; // Xóa nội dung ô nhập liệu
+				await fetchComments(); // Gọi lại hàm fetchComments sau khi thêm bình luận
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	import { onMount } from 'svelte';
+
+	// Hàm lấy bình luận từ Supabase
+	async function fetchComments() {
+		try {
+			if (!data.slug) {
+				console.error('Movie slug is missing!');
+				return;
+			}
+
+			const { data: fetchedComments, error } = await supabase
+				.from('comments')
+				.select('id, user_id, movie_id, comment, created_at, profiles(full_name)')
+				.eq('movie_id', data.slug);
+
+			console.log('Fetched Comments:', fetchedComments);
+			if (error) {
+				console.error('Error fetching comments:', error.message);
+			} else {
+				comments = fetchedComments; // Gán bình luận vào biến comments
+			}
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
+
+	onMount(() => {
+		fetchComments(); // Gọi hàm khi component được render
+	});
+
+	async function reportComment(comment: Comment) {
+		// Kiểm tra nếu người dùng chưa đăng nhập
+		if (!session?.user.id) {
+			alert('Bạn cần đăng nhập để báo cáo bình luận!');
+			return;
+		}
+
+		// Kiểm tra nếu người dùng cố báo cáo bình luận của chính mình
+		if (comment.user_id === session.user.id) {
+			alert('Bạn không thể báo cáo bình luận của chính mình!');
+			return;
+		}
+
+		try {
+			// Cập nhật cột report trong bảng comments
+			const { error } = await supabase
+				.from('comments')
+				.update({ report: true }) // Đặt giá trị report là true
+				.eq('id', comment.id); // Sử dụng comment.id để xác định bình luận
+
+			if (error) {
+				console.error('Error reporting comment:', error.message);
+				alert('Không thể báo cáo bình luận!');
+			} else {
+				alert('Bình luận đã được báo cáo thành công!');
+				// Cập nhật lại danh sách bình luận
+				await fetchComments();
+			}
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
 </script>
 
 <div class="px-44">
@@ -141,6 +250,55 @@
 					</button>
 				</div>
 			{/each}
+		</div>
+	</div>
+	<!-- Phần bình luận -->
+	<div class="comments-section mt-10">
+		<h2 class="text-lg font-bold mb-4">Bình luận</h2>
+		<!-- Danh sách bình luận -->
+		<div class="comments-list mb-4">
+			{#if comments.length > 0}
+				{#each comments as comment}
+					<div class="comment-item mb-4 p-4 bg-gray-100 rounded">
+						<p class="text-sm text-gray-500">
+							{comment.profiles.full_name} -
+							{comment.created_at
+								? new Date(comment.created_at).toLocaleString()
+								: 'Ngày không xác định'}
+						</p>
+						<p class="text-base" style="color:black;">{comment.comment}</p>
+						<!-- Nút báo cáo -->
+						{#if comment.user_id !== session?.user.id}
+							<button
+								class="btn btn-outline-danger btn-sm"
+								style=" top: 10px; right: 10px; z-index: 10; background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer;"
+								on:click={() => reportComment(comment)}
+							>
+								Báo cáo
+							</button>
+						{/if}
+					</div>
+				{/each}
+			{:else}
+				<p class="text-gray-500">Chưa có bình luận nào. Hãy là người đầu tiên bình luận!</p>
+			{/if}
+		</div>
+
+		<!-- Ô nhập liệu -->
+		<div class="add-comment" style="color: black;">
+			<textarea
+				class="w-full p-2 border rounded mb-2"
+				placeholder="Nhập bình luận của bạn..."
+				bind:value={comment}
+			></textarea>
+			<button
+				class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+				on:click={() => {
+					addComment();
+				}}
+			>
+				Gửi bình luận
+			</button>
 		</div>
 	</div>
 </div>

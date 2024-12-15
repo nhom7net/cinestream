@@ -1,4 +1,3 @@
-import { invalidateAll } from "$app/navigation";
 import type { Actions, PageServerLoad } from "./$types";
 import { redirect } from "@sveltejs/kit";
 
@@ -20,7 +19,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 
     const { data: comments, error: commentError } = await supabase
         .from('comments')
-        .select('id, user_id, movie_id, comment, profiles (username, full_name)')
+        .select('id, user_id, movie_id, comment, report, ...profiles(username, full_name)')
 
     if (commentError) {
         console.error('Failed to fetch comments:', commentError);
@@ -49,7 +48,6 @@ export const actions: Actions = {
             return { success: false, message: 'Failed to delete comment' };
         }
 
-        invalidateAll();
         return { success: true };
     }
 }
