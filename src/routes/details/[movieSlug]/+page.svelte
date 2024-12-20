@@ -1,10 +1,8 @@
 <script lang="ts">
-<<<<<<< HEAD
 	import { ThumbsUp, ThumbsDown } from 'lucide-svelte';
-=======
 	import { goto } from '$app/navigation';
+	import { onMount, afterUpdate } from 'svelte';
 
->>>>>>> origin/main
 	export let data;
 
 	let { session, supabase } = data;
@@ -65,20 +63,17 @@
 		}
 	}
 
-<<<<<<< HEAD
-=======
 	const goToMovie = (slug: string) => {
         goto(`/watch/${slug}`);
     };
 
->>>>>>> origin/main
 	type Comment = {
 		id: string; // id là chuỗi
 		user_id: string; // user_id là chuỗi
 		movie_id: string; // movie_id là chuỗi
 		comment: string;
 		created_at: string;
-		profiles: { full_name: string }[];
+		full_name: string;
 	};
 
 	let comments: Comment[] = [];
@@ -119,12 +114,6 @@
 		}
 	}
 
-<<<<<<< HEAD
-	import { onMount, afterUpdate } from 'svelte';
-=======
-	import { onMount } from 'svelte';
->>>>>>> origin/main
-
 	// Hàm lấy bình luận từ Supabase
 	async function fetchComments() {
 		try {
@@ -135,7 +124,7 @@
 
 			const { data: fetchedComments, error } = await supabase
 				.from('comments')
-				.select('id, user_id, movie_id, comment, created_at, profiles(full_name)')
+				.select('id, user_id, movie_id, comment, created_at, ...profiles(full_name)')
 				.eq('movie_id', data.slug);
 
 			console.log('Fetched Comments:', fetchedComments);
@@ -148,7 +137,6 @@
 			console.error('Error:', error);
 		}
 	}
-<<<<<<< HEAD
 	onMount(() => {
 		fetchComments(); // Gọi hàm khi component được render
 		fetchLikes();
@@ -160,11 +148,6 @@
 			fetchLikes();
 			fetchDisLikes();
 		}
-=======
-
-	onMount(() => {
-		fetchComments(); // Gọi hàm khi component được render
->>>>>>> origin/main
 	});
 
 	async function reportComment(comment: Comment) {
@@ -199,7 +182,6 @@
 			console.error('Error:', error);
 		}
 	}
-<<<<<<< HEAD
 
 	//Đánh giá
 	let isLiked = false;
@@ -398,9 +380,6 @@
 			console.error('Error fetching dislikes:', error);
 		}
 	};
-	//Đánh giá
-=======
->>>>>>> origin/main
 </script>
 
 <div class="px-44">
@@ -443,7 +422,6 @@
 				<h2 class="text-base font-bold mr-4 flex">Chất lượng:</h2>
 				<p class="text-base font-bold mb-2 ml-1">{data.quality}</p>
 			</div>
-<<<<<<< HEAD
 			<div class="flex">
 				<h2 class="text-base font-bold mr-4 flex">Đánh giá:</h2>
 				<div class="text-base font-bold mr-4 flex">
@@ -469,11 +447,6 @@
 
 			<div class="flex space-x-4 mt-8">
 				<button class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10">Xem phim</button>
-=======
-			<div class="flex space-x-4 mt-20">
-				<button class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10"
-					on:click={() => goToMovie(data.slug)}>Xem phim</button>
->>>>>>> origin/main
 				<button
 					class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
 					on:click={addToFavorites}
@@ -513,20 +486,13 @@
 		<!-- Danh sách bình luận -->
 		<div class="comments-list mb-4">
 			{#if comments.length > 0}
-<<<<<<< HEAD
 				<!-- {#each comments as comment} -->
-=======
->>>>>>> origin/main
 				{#each comments as comment}
 					<div class="comment-item mb-4 p-4 bg-gray-100 rounded">
 						<p class="text-sm text-gray-500">
-							{comment.profiles.full_name} -
+							{comment.full_name} -
 							{comment.created_at
-<<<<<<< HEAD
 								? new Date(comment.created_at).toLocaleDateString('vi-VN')
-=======
-								? new Date(comment.created_at).toLocaleString()
->>>>>>> origin/main
 								: 'Ngày không xác định'}
 						</p>
 						<p class="text-base" style="color:black;">{comment.comment}</p>
