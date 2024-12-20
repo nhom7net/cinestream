@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ThumbsUp, ThumbsDown } from 'lucide-svelte';
 	export let data;
 
 	let { session, supabase } = data;
@@ -106,7 +107,7 @@
 		}
 	}
 
-	import { onMount } from 'svelte';
+	import { onMount, afterUpdate } from 'svelte';
 
 	// Hàm lấy bình luận từ Supabase
 	async function fetchComments() {
@@ -131,9 +132,17 @@
 			console.error('Error:', error);
 		}
 	}
-
 	onMount(() => {
 		fetchComments(); // Gọi hàm khi component được render
+		fetchLikes();
+		fetchDisLikes();
+	});
+	afterUpdate(() => {
+		if (data.slug) {
+			fetchComments(); // Gọi lại fetchComments khi data.slug thay đổi
+			fetchLikes();
+			fetchDisLikes();
+		}
 	});
 
 	async function reportComment(comment: Comment) {
@@ -168,6 +177,205 @@
 			console.error('Error:', error);
 		}
 	}
+
+	//Đánh giá
+	let isLiked = false;
+	let isDisLiked = false;
+	let likesCount = 0;
+	let dislikesCount = 0;
+	let userId = session?.user.id;
+	let movieId = data.slug;
+
+	onMount(async () => {
+		if (!userId) return;
+
+		// Kiểm tra trạng thái like
+		const { data: likeData, error } = await supabase
+			.from('likes')
+			.select('likes')
+			.eq('movie_id', movieId)
+			.eq('user_id', userId)
+			.single();
+
+		if (error) {
+			console.error('Lỗi khi kiểm tra trạng thái like:', error.message);
+		} else {
+			isLiked = likeData?.likes || false; // Cập nhật trạng thái like
+		}
+
+		// Kiểm tra trạng thái dislike
+		const { data: dislikeData, error: dislikeError } = await supabase
+			.from('likes')
+			.select('dislikes')
+			.eq('movie_id', movieId)
+			.eq('user_id', userId)
+			.single();
+
+		if (dislikeError) {
+			console.error('Lỗi khi kiểm tra trạng thái dislike:', dislikeError.message);
+		} else {
+			isDisLiked = dislikeData?.dislikes || false; // Cập nhật trạng thái dislike
+		}
+
+		// Lấy số lượt like và dislike
+		fetchLikes();
+		fetchDisLikes();
+	});
+
+	async function clickLike() {
+		if (!userId) {
+			alert('Bạn cần đăng nhập để đánh giá phim!');
+			return;
+		}
+
+		try {
+			const { data: existingLike, error: fetchError } = await supabase
+				.from('likes')
+				.select('id, likes, dislikes')
+				.eq('movie_id', movieId)
+				.eq('user_id', userId)
+				.single();
+
+			if (fetchError && fetchError.code !== 'PGRST116') {
+				console.error('Lỗi kiểm tra trạng thái:', fetchError.message);
+				alert('Đã xảy ra lỗi khi kiểm tra trạng thái!');
+				return;
+			}
+
+			if (existingLike) {
+				const { error: updateError } = await supabase
+					.from('likes')
+					.update({
+						likes: !existingLike.likes,
+						dislikes: false // Tự động hủy dislike
+					})
+					.eq('id', existingLike.id);
+
+				if (updateError) {
+					console.error('Lỗi khi cập nhật like:', updateError.message);
+					alert('Đã xảy ra lỗi khi cập nhật trạng thái!');
+					return;
+				}
+
+				isLiked = !existingLike.likes; // Cập nhật trạng thái giao diện
+				isDisLiked = false; // Tắt dislike khi like được kích hoạt
+			} else {
+				const { error: insertError } = await supabase
+					.from('likes')
+					.insert([{ movie_id: movieId, user_id: userId, likes: true, dislikes: false }]);
+
+				if (insertError) {
+					console.error('Lỗi khi thêm like:', insertError.message);
+					alert('Đã xảy ra lỗi khi thêm like!');
+					return;
+				}
+
+				isLiked = true; // Cập nhật trạng thái giao diện
+				isDisLiked = false; // Đảm bảo dislike được hủy
+			}
+		} catch (error) {
+			console.error('Lỗi không mong đợi:', error);
+			alert('Đã xảy ra lỗi!');
+		}
+		fetchLikes();
+		fetchDisLikes();
+	}
+
+	async function clickDisLike() {
+		if (!userId) {
+			alert('Bạn cần đăng nhập để đánh giá phim!');
+			return;
+		}
+
+		try {
+			const { data: existingLike, error: fetchError } = await supabase
+				.from('likes')
+				.select('id, likes, dislikes')
+				.eq('movie_id', movieId)
+				.eq('user_id', userId)
+				.single();
+
+			if (fetchError && fetchError.code !== 'PGRST116') {
+				console.error('Lỗi kiểm tra trạng thái:', fetchError.message);
+				alert('Đã xảy ra lỗi khi kiểm tra trạng thái!');
+				return;
+			}
+
+			if (existingLike) {
+				const { error: updateError } = await supabase
+					.from('likes')
+					.update({
+						dislikes: !existingLike.dislikes,
+						likes: false // Tự động hủy like
+					})
+					.eq('id', existingLike.id);
+
+				if (updateError) {
+					console.error('Lỗi khi cập nhật dislike:', updateError.message);
+					alert('Đã xảy ra lỗi khi cập nhật trạng thái!');
+					return;
+				}
+
+				isDisLiked = !existingLike.dislikes; // Cập nhật trạng thái giao diện
+				isLiked = false; // Tắt like khi dislike được kích hoạt
+			} else {
+				const { error: insertError } = await supabase
+					.from('likes')
+					.insert([{ movie_id: movieId, user_id: userId, likes: false, dislikes: true }]);
+
+				if (insertError) {
+					console.error('Lỗi khi thêm dislike:', insertError.message);
+					alert('Đã xảy ra lỗi khi thêm dislike!');
+					return;
+				}
+
+				isDisLiked = true; // Cập nhật trạng thái giao diện
+				isLiked = false; // Đảm bảo like được hủy
+			}
+		} catch (error) {
+			console.error('Lỗi không mong đợi:', error);
+			alert('Đã xảy ra lỗi!');
+		}
+		fetchLikes();
+		fetchDisLikes();
+	}
+
+	// Fetch like count
+	const fetchLikes = async () => {
+		const { data: localData, error } = await supabase
+			.from('likes')
+			.select('movie_id')
+			.eq('likes', true)
+			.eq('movie_id', data.slug);
+
+		if (error) {
+			console.error('Error fetching likes:', error);
+			return;
+		}
+
+		likesCount = localData ? localData.length : 0;
+	};
+
+	// Fetch dislike count
+	const fetchDisLikes = async () => {
+		try {
+			const { data: localData, error } = await supabase
+				.from('likes')
+				.select('movie_id')
+				.eq('dislikes', true)
+				.eq('movie_id', data.slug);
+
+			if (error) {
+				console.error('Error fetching dislikes:', error);
+				return;
+			}
+
+			dislikesCount = localData ? localData.length : 0;
+		} catch (error) {
+			console.error('Error fetching dislikes:', error);
+		}
+	};
+	//Đánh giá
 </script>
 
 <div class="px-44">
@@ -176,7 +384,7 @@
 	<div class="mb-6 flex items-center space-x-4">
 		<img src={data.poster} alt={data.name} class="w-52 h-80 rounded-md" />
 
-		<div class="flex flex-col pl-10">
+		<div class="flex flex-col pl-10 h-80">
 			<p class="text-xl font-bold mb-2">{data.name}</p>
 			<div class="flex items-center mb-2">
 				<h2 class="text-base font-bold mr-4">Thể loại:</h2>
@@ -210,7 +418,30 @@
 				<h2 class="text-base font-bold mr-4 flex">Chất lượng:</h2>
 				<p class="text-base font-bold mb-2 ml-1">{data.quality}</p>
 			</div>
-			<div class="flex space-x-4 mt-20">
+			<div class="flex">
+				<h2 class="text-base font-bold mr-4 flex">Đánh giá:</h2>
+				<div class="text-base font-bold mr-4 flex">
+					<button
+						class="flex items-center space-x-2 h-1/2 {isLiked ? 'text-red-500' : ''}"
+						on:click={clickLike}
+					>
+						<ThumbsUp size="24" />
+						<span>{likesCount}</span>
+						<span>Lượt</span>
+					</button>
+
+					<button
+						class="flex items-center space-x-2 h-1/2 {isDisLiked ? 'text-red-500' : ''}"
+						on:click={clickDisLike}
+					>
+						<ThumbsDown size="24" />
+						<span>{dislikesCount}</span>
+						<span>Lượt</span>
+					</button>
+				</div>
+			</div>
+
+			<div class="flex space-x-4 mt-8">
 				<button class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10">Xem phim</button>
 				<button
 					class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
@@ -251,12 +482,13 @@
 		<!-- Danh sách bình luận -->
 		<div class="comments-list mb-4">
 			{#if comments.length > 0}
+				<!-- {#each comments as comment} -->
 				{#each comments as comment}
 					<div class="comment-item mb-4 p-4 bg-gray-100 rounded">
 						<p class="text-sm text-gray-500">
 							{comment.profiles.full_name} -
 							{comment.created_at
-								? new Date(comment.created_at).toLocaleString()
+								? new Date(comment.created_at).toLocaleDateString('vi-VN')
 								: 'Ngày không xác định'}
 						</p>
 						<p class="text-base" style="color:black;">{comment.comment}</p>
