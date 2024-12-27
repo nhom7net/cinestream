@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 
     const { data: comments, error: commentError } = await supabase
         .from('comments')
-        .select('id, user_id, movie_id, comment, report, ...profiles(username, full_name)')
+        .select('id, user_id, movie_id, comment, report, ...profiles(username, full_name, avatar_url)')
 
     if (commentError) {
         console.error('Failed to fetch comments:', commentError);
