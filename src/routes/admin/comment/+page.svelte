@@ -1,10 +1,14 @@
 <script lang="ts">
 	import { Paginator, type PaginationSettings } from '@skeletonlabs/skeleton';
+	import Avatar from '$lib/Avatar.svelte';
 
 	export let data;
 
 	let source = [];
 	$: source = data?.comments ?? [];
+
+	let { supabase } = data;
+	$: ({ supabase } = data);
 
     let searchUsername = '';
     let searchComment = '';
@@ -41,69 +45,72 @@
 	);
 </script>
 
-<h1 class="text-4xl font-bold mt-7 pl-10">Quản lý bình luận</h1>
+<h1 class="text-4xl font-bold mt-7 pl-12">Quản lý bình luận</h1>
 
-<div class="flex flex-row gap-16 pt-10">
+<div class="flex mx-12 gap-6 w-full my-6">
 	<!-- Search and Filter Section -->
-	<section class="space-y-4 pl-10">
-		<div>
+	<div class="card variant-filled-surface p-4 h-fit sticky top-0 w-1/5">
+		<form class="space-y-4">
+			<p class="h4">Tìm tên/username</p>
 			<input 
-				class="input border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:ring-blue-300" 
 				type="text" 
-				placeholder="Search username..."
+				placeholder="Tìm theo username"
 				bind:value={searchUsername}
 			/>
-		</div>
-		<div>
-			<input 
-				class="input border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:ring-blue-300" 
+
+			<p class="h4">Tìm bình luận</p>
+			<input
 				type="text" 
-				placeholder="Search comment..."
+				placeholder="Tìm bình luận"
 				bind:value={searchComment}
 			/>
-		</div>
-		<div class="space-y-2">
+
 			<button type="button" class="btn bg-rose-700" on:click={toggleReportFilter}>
-			  {btnCommentReported ? 'Hiển thị tất cả' : 'Bị báo cáo'}
+				{btnCommentReported ? 'Hiển thị tất cả' : 'Bị báo cáo'}
 			</button>
-		  </div>
-	</section>
-	{#if paginatedData.length > 0}
-	<!-- Comments Section -->
-	<div class="space-y-4 w-full pr-10">
-		{#each paginatedData as comment}
-			<article class="card border border-gray-200 shadow-sm rounded-lg p-4 bg-white">
-				<div class="flex flex-row justify-between">
-					<div>
-						<div class="flex flex-row gap-2 items-center text-sm text-amber-500">
-							<p class="font-semibold">{comment.full_name}</p>
-							<p class="text-gray-400">@{comment.username}</p>
-						</div>
-						<p class="text-gray-500 text-xs mt-1">Movie ID: {comment.movie_id}</p>
-						<p class="mt-2">{comment.comment}</p>
-					</div>
-					<div>
-						<form method="POST" action="?/deleteComment">
-							<input type="hidden" name="commentId" value={comment.id} />
-							<button 
-								type="submit" 
-								class="text-red-500 hover:text-red-700 font-medium text-sm">
-								Delete
-							</button>
-						</form>
-					</div>
-				</div>
-			</article>
-		{/each}
-		<div class="pt-2">
-			<Paginator
-				bind:settings={paginationSettings}
-				showFirstLastButtons={true}
-				showPreviousNextButtons={true}
-			/>
-		</div>
+		</form>
 	</div>
-	{:else}
-	<p class="text-gray-500 text-center">No comments available.</p>
-	{/if}
+	<div class="w-[75%]">
+		{#if paginatedData.length > 0}
+			<!-- Comments Section -->
+			<ul class="list space-y-3 w-11/12 pl-6">
+				{#each paginatedData as comment}
+					<li class="div card p-4 variant-filled-surface flex justify-between">
+						<div class="flex gap-3 w-full items-center">
+							<div class="rounded-full overflow-hidden">
+								<Avatar {supabase} url={comment.avatar_url} />
+							</div>							
+							<div>
+								<p>
+									<span class="h3">{comment.full_name}</span>
+									<span>@{comment.username}</span>
+								</p>
+								<p class="text-gray-500 text-xs mt-1">Movie ID: {comment.movie_id}</p>
+								<p class="mt-2">{comment.comment}</p>
+							</div>
+							<div class="ml-auto">
+								<form method="POST" action="?/deleteComment">
+									<input type="hidden" name="commentId" value={comment.id} />
+									<button 
+										type="submit" 
+										class="bg-red-600 text-white text-sm py-1 px-3 rounded hover:bg-red-700 focus:outline-none">
+										Delete
+									</button>
+								</form>
+							</div>
+						</div>
+					</li>
+				{/each}
+				<div class="pt-2">
+					<Paginator
+						bind:settings={paginationSettings}
+						showFirstLastButtons={true}
+						showPreviousNextButtons={true}
+					/>
+				</div>
+			</ul>
+		{:else}
+		<p class="text-gray-500 text-center">No comments available.</p>
+		{/if}
+	</div>
 </div>
