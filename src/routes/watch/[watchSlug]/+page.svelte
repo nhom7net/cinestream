@@ -138,7 +138,7 @@
 						</div>
 						<div>
 							<p class="text-base font-medium text-sky-400">
-								{comment.profiles.full_name}
+								{comment.full_name}
 							</p>
 							<p class="text-xs text-gray-400">
 								{comment.created_at && !isNaN(Date.parse(comment.created_at))
