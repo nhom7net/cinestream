@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ThumbsUp, ThumbsDown } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
+	import Avatar from '$lib/Avatar.svelte';
 	import { onMount, afterUpdate } from 'svelte';
 
 	export let data;
@@ -63,9 +64,9 @@
 		}
 	}
 
-	const goToMovie = (slug: string) => {
-        goto(`/watch/${slug}`);
-    };
+	const goToMovie = (slug: string, episode: string = '01') => {
+		goto(`/watch/${slug}?episode=${episode}`);
+	};
 
 	type Comment = {
 		id: string; // id là chuỗi
@@ -124,7 +125,7 @@
 
 			const { data: fetchedComments, error } = await supabase
 				.from('comments')
-				.select('id, user_id, movie_id, comment, created_at, ...profiles(full_name)')
+				.select('id, user_id, movie_id, comment, created_at, ...profiles(full_name, avatar_url)')
 				.eq('movie_id', data.slug);
 
 			console.log('Fetched Comments:', fetchedComments);
@@ -445,8 +446,12 @@
 				</div>
 			</div>
 
-			<div class="flex space-x-4 mt-8">
-				<button class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10">Xem phim</button>
+			<div class="flex space-x-4 mt-20">
+				<button
+					class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10"
+					on:click={() => goToMovie(data.slug, data.episode.name)}>Xem phim</button
+				>
+        
 				<button
 					class="bg-yellow-500 text-white rounded hover:bg-yellow-700 w-22 h-10"
 					on:click={addToFavorites}
@@ -462,72 +467,85 @@
 		<p class="text-base">{data.content}</p>
 	</div>
 
-	<div class="mb-6 mt-6">
-		<h2 class="text-lg font-bold mb-4">Danh sách tập phim:</h2>
-		<div class="flex flex-wrap justify-start gap-5">
-			{#each data.episode as ep}
-				<div class="flex">
-					<button
-						class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 w-20"
-						on:click={() => {
-							saveHistory(ep.name, ep.link_embed);
-							window.open(ep.link_embed, '_blank');
-						}}
-					>
-						{ep.name}
-					</button>
-				</div>
-			{/each}
+	<div class="mb-6 mt-3 w-full">
+		<!-- Hộp chứa các tập phim có thể cuộn -->
+		<div class="h-auto overflow-y-auto">
+			<p class="text-lg font-bold mr-4 flex pb-3">Danh sách tập</p>
+			<div class="flex flex-wrap justify-start gap-2">
+				{#each data.episode as ep}
+					<div class="flex">
+						<button
+							class="bg-zinc-600 text-white py-2 px-4 rounded hover:bg-zinc-800 w-12 text-sm"
+							on:click={() => {
+								goToMovie(data.slug, ep.name);
+								saveHistory(ep.name, ep.link_embed);
+							}}
+						>
+							{ep.name}
+						</button>
+					</div>
+				{/each}
+			</div>
 		</div>
 	</div>
+  
 	<!-- Phần bình luận -->
-	<div class="comments-section mt-10">
-		<h2 class="text-lg font-bold mb-4">Bình luận</h2>
-		<!-- Danh sách bình luận -->
-		<div class="comments-list mb-4">
-			{#if comments.length > 0}
-				<!-- {#each comments as comment} -->
-				{#each comments as comment}
-					<div class="comment-item mb-4 p-4 bg-gray-100 rounded">
-						<p class="text-sm text-gray-500">
-							{comment.full_name} -
-							{comment.created_at
-								? new Date(comment.created_at).toLocaleDateString('vi-VN')
-								: 'Ngày không xác định'}
-						</p>
-						<p class="text-base" style="color:black;">{comment.comment}</p>
-						<!-- Nút báo cáo -->
+	<h2 class="text-lg font-bold pb-3 text-yellow-400">Bình luận</h2>
+	<!-- Danh sách bình luận -->
+	<div class="comments-list mb-4">
+		{#if comments.length > 0}
+			{#each comments as comment}
+				<div class="mb-4 p-4 bg-zinc-800 rounded shadow flex flex-col">
+					<div class="flex justify-between items-center mb-3">
+						<div class="flex items-center gap-3">
+							<div class="rounded-full overflow-hidden border border-sky-500">
+								<Avatar {supabase} url={comment.avatar_url} />
+							</div>
+							<div>
+								<p class="text-base font-medium text-sky-400">
+									{comment.full_name}
+								</p>
+								<p class="text-xs text-gray-400">
+									{comment.created_at && !isNaN(Date.parse(comment.created_at))
+										? new Date(comment.created_at).toLocaleDateString('vi-VN')
+										: 'Ngày không xác định'}
+								</p>
+								<p class="text-gray-300">
+									{comment.comment}
+								</p>
+							</div>
+						</div>
+							<!-- Nút báo cáo -->
 						{#if comment.user_id !== session?.user.id}
 							<button
-								class="btn btn-outline-danger btn-sm"
-								style=" top: 10px; right: 10px; z-index: 10; background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer;"
+								class="bg-red-500 text-white text-sm py-1 px-3 rounded hover:bg-red-600 transition focus:outline-none"
 								on:click={() => reportComment(comment)}
 							>
 								Báo cáo
 							</button>
 						{/if}
 					</div>
-				{/each}
-			{:else}
-				<p class="text-gray-500">Chưa có bình luận nào. Hãy là người đầu tiên bình luận!</p>
-			{/if}
-		</div>
+				</div>
+			{/each}
+		{:else}
+			<p class="text-gray-500 text-center">Chưa có bình luận nào. Hãy là người đầu tiên bình luận!</p>
+		{/if}
+	</div>
 
-		<!-- Ô nhập liệu -->
-		<div class="add-comment" style="color: black;">
-			<textarea
-				class="w-full p-2 border rounded mb-2"
-				placeholder="Nhập bình luận của bạn..."
-				bind:value={comment}
-			></textarea>
-			<button
-				class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-				on:click={() => {
-					addComment();
-				}}
-			>
-				Gửi bình luận
-			</button>
-		</div>
+	<!-- Ô nhập liệu -->
+	<div class="mt-4">
+		<textarea
+			class="w-full p-2 border rounded mb-2 bg-zinc-700 text-white"
+			placeholder="Nhập bình luận của bạn..."
+			bind:value={comment}
+		></textarea>
+		<button
+			class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 w-full sm:w-auto"
+			on:click={() => {
+				addComment();
+			}}
+		>
+			Gửi bình luận
+		</button>
 	</div>
 </div>
