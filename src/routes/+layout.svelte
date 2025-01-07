@@ -141,9 +141,6 @@
 				</div>
 				<!-- Other icons for navigation -->
 				{#if session}
-					<a class="btn btn-sm variant-ghost-surface" href="/list">
-						<List />
-					</a>
 					<a class="btn btn-sm variant-ghost-surface" href="/bookmark">
 						<Bookmark />
 					</a>

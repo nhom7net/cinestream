@@ -94,7 +94,7 @@
 	}
 </script>
 
-<h1 class="pt-10 pb-5 text-3xl font-bold text-orange-400 pl-64">{data.name}</h1>
+<h1 class="text-center pt-10 pb-5 text-3xl font-bold text-orange-400">{data.name}</h1>
 <div class="flex flex-col items-center">
 	{#if selectedEpisode}
 		<!-- svelte-ignore a11y-missing-attribute -->

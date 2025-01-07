@@ -2,7 +2,7 @@
 	export let data;
 </script>
 
-<h1 class="text-4xl font-bold mt-6 pl-10">Phim đã yêu thích</h1>
+<h2 class="font-bold mt-7 pl-10">Phim đã yêu thích</h2>
 
 <div class="flex flex-col px-56 pt-20 mr">
 	{#if data.slugMovies.length > 0}
