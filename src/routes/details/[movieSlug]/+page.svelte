@@ -446,7 +446,7 @@
 				</div>
 			</div>
 
-			<div class="flex space-x-4 mt-20">
+			<div class="flex space-x-4">
 				<button
 					class="bg-red-500 text-white rounded hover:bg-red-700 w-22 h-10"
 					on:click={() => goToMovie(data.slug, data.episode.name)}>Xem phim</button
