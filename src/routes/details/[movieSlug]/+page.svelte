@@ -42,28 +42,6 @@
 		}
 	}
 
-	async function saveHistory(episode: any, links: any) {
-		console.log('saveHistory');
-		const user = data.session?.user.id;
-		if (!user) {
-			return;
-		}
-		try {
-			const { data: addData, error } = await supabase
-				.from('history')
-				.insert([{ user: user, movie: data.film, episodes: episode, link: links }]);
-
-			console.log('Payload to Supabase:', {
-				user: user,
-				movie: data.film,
-				episodes: episode,
-				link: links
-			});
-		} catch (error) {
-			console.error(error);
-		}
-	}
-
 	const goToMovie = (slug: string, episode: string = '01') => {
 		goto(`/watch/${slug}?episode=${episode}`);
 	};
@@ -478,7 +456,6 @@
 							class="bg-zinc-600 text-white py-2 px-4 rounded hover:bg-zinc-800 w-12 text-sm"
 							on:click={() => {
 								goToMovie(data.slug, ep.name);
-								saveHistory(ep.name, ep.link_embed);
 							}}
 						>
 							{ep.name}
