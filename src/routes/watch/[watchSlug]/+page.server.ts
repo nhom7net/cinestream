@@ -1,6 +1,6 @@
-import type { PageServerLoad } from "../$types";
+import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params, locals: { supabase } }) => {
+export const load: PageServerLoad = async ({ params, locals: { supabase, safeGetSession } }) => {    
     const { data: comment, error } = await supabase
         .from('comments')
         .select('id, user_id, movie_id, comment, created_at, ...profiles(full_name, avatar_url)')
@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase } }) => 
         console.error('Lỗi khi lấy bình luận:', error.message);
     }
 
-    return { 
+    return {
         comment,
         slug: params.watchSlug 
     };

@@ -13,7 +13,8 @@
 						<img src={movie.poster} alt={movie.name} class="w-20 h-30 object-cover rounded-md" />
 						<div class="flex-grow">
 							<span class="text-xl font-semibold text-white-800">{movie.name}</span>
-							<span class="text-xl font-semibold text-white-800">{movie.episode}</span>
+							<br />
+							<span class="text-xl font-semibold text-white-800">Tập {movie.episode}</span>
 						</div>
 					</a>
 				</li>

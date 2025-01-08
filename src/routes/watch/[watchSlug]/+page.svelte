@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { get } from 'svelte/store';
 	import Avatar from '$lib/Avatar.svelte';
+	import { onMount } from 'svelte';
 
 	export let data;
 
@@ -10,10 +11,30 @@
 	let comment = '';
 	let selectedEpisode: string = '';
 
-	$: {
-		const params = new URLSearchParams(get(page).url.search);
-		const episode = params.get('episode');
+	const params = new URLSearchParams(get(page).url.search);
+	const episode = params.get('episode');
 
+	onMount(() => {
+		saveHistory(episode, data.slug);
+	});
+
+	async function saveHistory(episode: any, slug: any) {
+		const user = data.session?.user.id;
+		if (!user) {
+			return;
+		}
+		try {
+			let link = `/watch/${slug}?episode=${episode}`;
+
+			const { data: addData, error } = await supabase
+				.from('history')
+				.insert([{ user: user, movie: data.slug, episodes: episode, link }]);
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	$: {
 		if (episode) {
 			const selected = data.episode.find((ep: { name: string }) => ep.name === episode);
 			if (selected) {
